@@ -28,8 +28,6 @@ public class Main {
         String domain = "dl.dropboxusercontent.com";
         Timestamp ts = new Timestamp(2013, 0, 0, 0, 0, 0);
 
-        new Timestamp("20130912133257");
-
         new ScanDomain(domain, ts).startScanning();
     }
 

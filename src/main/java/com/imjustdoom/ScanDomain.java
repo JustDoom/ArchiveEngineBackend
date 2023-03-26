@@ -9,7 +9,7 @@ import java.net.URL;
 
 public class ScanDomain {
 
-    private final String apiUrl = "https://web.archive.org/web/timemap/json?url=dl.dropboxusercontent.com&matchType=prefix&collapse=urlkey&output=json&fl=original%2Cmimetype%2Ctimestamp%2Cendtimestamp%2Cgroupcount%2Cstatuscode&limit=10000&from=2014122216&to=2014122216";
+    private final String apiUrl = "https://web.archive.org/web/timemap/json?url=dl.dropboxusercontent.com";
 
     private final String domain;
     private Timestamp timestamp;
@@ -22,12 +22,19 @@ public class ScanDomain {
     public void startScanning() {
         checkForExistingSave();
 
-        String url = new ApiUrlBuilder()
-                .setDomain(this.domain)
-                .build();
+        getLinks();
+    }
 
+    private void checkForExistingSave() {
+        if (Main.instance.getSaving().getDomain().equals(this.domain)) {
+            this.timestamp = new Timestamp(Main.instance.getSaving().getTimestamp());
+        }
+    }
+
+    private void getLinks() {
         try {
-            String response = readUrl(this.apiUrl);
+            System.out.println(new ApiUrlBuilder().setLimit(841).setDomain(this.domain).setFrom(this.timestamp.toString()).setTo(this.timestamp.toString()).build());
+            String response = readUrl(new ApiUrlBuilder().setLimit(841).setDomain(this.domain).setFrom(this.timestamp.toString()).setTo(this.timestamp.toString()).build());
             JsonElement element = JsonParser.parseString(response);
 
             for (int i = 1; i < element.getAsJsonArray().size(); i++) {
@@ -41,12 +48,6 @@ public class ScanDomain {
             }
         } catch (Exception exception) {
             exception.printStackTrace();
-        }
-    }
-
-    private void checkForExistingSave() {
-        if (Main.instance.getSaving().getDomain().equals(this.domain)) {
-            this.timestamp = new Timestamp(Main.instance.getSaving().getTimestamp());
         }
     }
 
