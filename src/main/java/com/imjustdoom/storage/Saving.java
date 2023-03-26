@@ -1,7 +1,8 @@
-package com.imjustdoom;
+package com.imjustdoom.storage;
 
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
+import com.imjustdoom.Main;
 import lombok.Getter;
 
 import java.io.File;

@@ -1,9 +1,10 @@
 package com.imjustdoom;
 
+import com.imjustdoom.storage.Database;
+import com.imjustdoom.storage.Saving;
 import lombok.Getter;
 
 import java.net.URISyntaxException;
-import java.sql.SQLException;
 
 @Getter
 public class Main {
@@ -12,6 +13,8 @@ public class Main {
     private final Saving saving;
 
     public Main() {
+        instance = this;
+
         this.saving = new Saving();
         try {
             this.saving.loadSaveFile();
@@ -22,17 +25,13 @@ public class Main {
 
         this.database = new Database();
 
-        for (int i = 0; i < 20000; i++) {
-            try {
-                database.addLink("https://test", "text/html", "20111212064341", "20111212064341", "200");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        String domain = "dl.dropboxusercontent.com";
+
+        new ScanDomain(domain).startScanning();
     }
 
     public static void main(String[] args) {
-        instance = new Main();
+        new Main();
     }
 
     public static Main instance;
