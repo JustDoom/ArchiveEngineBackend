@@ -27,12 +27,9 @@ public class ScanDomain {
                 .build();
 
         try {
-            System.out.println("Making a request, this may take a while...");
             String response = readUrl(this.apiUrl);
             JsonElement element = JsonParser.parseString(response);
-            System.out.println("Got response");
 
-            System.out.println("Size: " + element.getAsJsonArray().size());
             for (int i = 1; i < element.getAsJsonArray().size(); i++) {
                 JsonElement urlInfo = element.getAsJsonArray().get(i);
                 Main.instance.getDatabase().addLinkIfNotExists(
@@ -42,7 +39,6 @@ public class ScanDomain {
                         urlInfo.getAsJsonArray().get(3).getAsString(),
                         urlInfo.getAsJsonArray().get(5).getAsString());
             }
-            System.out.println("Added to the database");
         } catch (Exception exception) {
             exception.printStackTrace();
         }
