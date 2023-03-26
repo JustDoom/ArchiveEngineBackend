@@ -12,10 +12,11 @@ public class ScanDomain {
     private final String apiUrl = "https://web.archive.org/web/timemap/json?url=dl.dropboxusercontent.com&matchType=prefix&collapse=urlkey&output=json&fl=original%2Cmimetype%2Ctimestamp%2Cendtimestamp%2Cgroupcount%2Cstatuscode&limit=10000&from=2014122216&to=2014122216";
 
     private final String domain;
-    private String timestamp;
+    private Timestamp timestamp;
 
-    public ScanDomain(String domain) {
+    public ScanDomain(String domain, Timestamp timestamp) {
         this.domain = domain;
+        this.timestamp = timestamp;
     }
 
     public void startScanning() {
@@ -49,7 +50,7 @@ public class ScanDomain {
 
     private void checkForExistingSave() {
         if (Main.instance.getSaving().getDomain().equals(this.domain)) {
-            this.timestamp = Main.instance.getSaving().getTimestamp();
+            this.timestamp = new Timestamp(Main.instance.getSaving().getTimestamp());
         }
     }
 

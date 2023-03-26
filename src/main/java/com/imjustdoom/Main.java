@@ -26,8 +26,11 @@ public class Main {
         this.database = new Database();
 
         String domain = "dl.dropboxusercontent.com";
+        Timestamp ts = new Timestamp(2013, 0, 0, 0, 0, 0);
 
-        new ScanDomain(domain).startScanning();
+        new Timestamp("20130912133257");
+
+        new ScanDomain(domain, ts).startScanning();
     }
 
     public static void main(String[] args) {
