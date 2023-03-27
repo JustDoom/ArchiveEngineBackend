@@ -64,7 +64,7 @@ public class ScanDomain {
             }
 
             // TODO: run on another thread so it can make a request while this is running
-            new Thread(() -> {
+            //new Thread(() -> {
                 for (int i = 1; i < element.getAsJsonArray().size(); i++) {
                     JsonElement urlInfo = element.getAsJsonArray().get(i);
                     try {
@@ -78,7 +78,7 @@ public class ScanDomain {
                         throw new RuntimeException(e);
                     }
                 }
-            }).start();
+            //}).start();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
