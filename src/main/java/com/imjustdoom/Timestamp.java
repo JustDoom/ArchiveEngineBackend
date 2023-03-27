@@ -3,8 +3,9 @@ package com.imjustdoom;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
-@AllArgsConstructor
 public class Timestamp {
 
     private int year;
@@ -14,6 +15,19 @@ public class Timestamp {
     private int minute;
     private int second;
 
+    private LocalDateTime time;
+
+    public Timestamp(int year, int month, int day, int hour, int minute, int second) {
+        this.year = year;
+        this.month = month;
+        this.day = day;
+        this.hour = hour;
+        this.minute = minute;
+        this.second = second;
+
+        this.time = LocalDateTime.of(year, month, day, hour, minute, second);
+    }
+
     public Timestamp(String timestamp) {
         String year = timestamp.substring(0, 4);
         String month = timestamp.substring(4, 6);
@@ -22,12 +36,44 @@ public class Timestamp {
         String minute = timestamp.substring(10, 12);
         String second = timestamp.substring(12, 14);
 
-        this.year = Integer.parseInt(year);
-        this.month = Integer.parseInt(month);
-        this.day = Integer.parseInt(day);
-        this.hour = Integer.parseInt(hour);
-        this.minute = Integer.parseInt(minute);
-        this.second = Integer.parseInt(second);
+        this.time = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), Integer.parseInt(hour), Integer.parseInt(minute), Integer.parseInt(second));
+
+        this.year = this.time.getYear();
+        this.month = this.time.getMonthValue();
+        this.day = this.time.getDayOfMonth();
+        this.hour = this.time.getHour();
+        this.minute = this.time.getMinute();
+        this.second = this.time.getSecond();
+    }
+
+    public void plusYears(int years) {
+        this.time = this.time.plusYears(years);
+        this.year = this.time.getYear();
+    }
+
+    public void plusMonths(int months) {
+        this.time = this.time.plusMonths(months);
+        this.month = this.time.getMonthValue();
+    }
+
+    public void plusDays(int days) {
+        this.time = this.time.plusDays(days);
+        this.day = this.time.getDayOfMonth();
+    }
+
+    public void plusHours(int hours) {
+        this.time = this.time.plusHours(hours);
+        this.hour = this.time.getHour();
+    }
+
+    public void plusMinutes(int minutes) {
+        this.time = this.time.plusMinutes(minutes);
+        this.minute = this.time.getMinute();
+    }
+
+    public void plusSeconds(int seconds) {
+        this.time = this.time.plusSeconds(seconds);
+        this.second = this.time.getSecond();
     }
 
     @Override

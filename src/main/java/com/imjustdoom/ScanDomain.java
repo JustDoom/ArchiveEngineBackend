@@ -14,6 +14,8 @@ public class ScanDomain {
     private final String domain;
     private Timestamp timestamp;
 
+    private final int defSub = 6;
+
     public ScanDomain(String domain, Timestamp timestamp) {
         this.domain = domain;
         this.timestamp = timestamp;
@@ -22,7 +24,18 @@ public class ScanDomain {
     public void startScanning() {
         checkForExistingSave();
 
-        getLinks();
+        int sub = defSub;
+
+        // Make it stop after a certain date, for now it's fine for testing
+        while (true) {
+            if (getLinks(sub)) {
+                if (sub == 14) System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                sub = sub + 2;
+            } else {
+                sub = defSub;
+                timestamp.plusDays(1);
+            }
+        }
     }
 
     private void checkForExistingSave() {
@@ -31,11 +44,15 @@ public class ScanDomain {
         }
     }
 
-    private void getLinks() {
+    private boolean getLinks(int sub) {
         try {
-            System.out.println(new ApiUrlBuilder().setLimit(841).setDomain(this.domain).setFrom(this.timestamp.toString()).setTo(this.timestamp.toString()).build());
-            String response = readUrl(new ApiUrlBuilder().setLimit(841).setDomain(this.domain).setFrom(this.timestamp.toString()).setTo(this.timestamp.toString()).build());
+            System.out.println(new ApiUrlBuilder().setLimit(10000).setDomain(this.domain).setFrom(this.timestamp.toString().substring(0, sub)).setTo(this.timestamp.toString().substring(0, sub)).build());
+            String response = readUrl(new ApiUrlBuilder().setLimit(10000).setDomain(this.domain).setFrom(this.timestamp.toString().substring(0, sub)).setTo(this.timestamp.toString().substring(0, sub)).build());
             JsonElement element = JsonParser.parseString(response);
+            System.out.println(element.getAsJsonArray().size());
+            if (element.getAsJsonArray().size() >= 10000) {
+                return true;
+            }
 
             for (int i = 1; i < element.getAsJsonArray().size(); i++) {
                 JsonElement urlInfo = element.getAsJsonArray().get(i);
@@ -49,6 +66,8 @@ public class ScanDomain {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+
+        return false;
     }
 
     private String readUrl(String urlString) throws Exception {
