@@ -13,12 +13,14 @@ public class ScanDomain {
 
     private final String domain;
     private Timestamp timestamp;
+    private final int limit;
 
     private final int defSub = 6;
 
-    public ScanDomain(String domain, Timestamp timestamp) {
+    public ScanDomain(String domain, Timestamp timestamp, int limit) {
         this.domain = domain;
         this.timestamp = timestamp;
+        this.limit = limit;
     }
 
     public void startScanning() {
@@ -46,14 +48,15 @@ public class ScanDomain {
 
     private boolean getLinks(int sub) {
         try {
-            System.out.println(new ApiUrlBuilder().setLimit(10000).setDomain(this.domain).setFrom(this.timestamp.toString().substring(0, sub)).setTo(this.timestamp.toString().substring(0, sub)).build());
-            String response = readUrl(new ApiUrlBuilder().setLimit(10000).setDomain(this.domain).setFrom(this.timestamp.toString().substring(0, sub)).setTo(this.timestamp.toString().substring(0, sub)).build());
+            System.out.println(new ApiUrlBuilder().setLimit(this.limit).setDomain(this.domain).setFrom(this.timestamp.toString().substring(0, sub)).setTo(this.timestamp.toString().substring(0, sub)).build());
+            String response = readUrl(new ApiUrlBuilder().setLimit(this.limit).setDomain(this.domain).setFrom(this.timestamp.toString().substring(0, sub)).setTo(this.timestamp.toString().substring(0, sub)).build());
             JsonElement element = JsonParser.parseString(response);
             System.out.println(element.getAsJsonArray().size());
-            if (element.getAsJsonArray().size() >= 10000) {
+            if (element.getAsJsonArray().size() >= this.limit) {
                 return true;
             }
 
+            // TODO: run on another thread so it can make a request while this is running
             for (int i = 1; i < element.getAsJsonArray().size(); i++) {
                 JsonElement urlInfo = element.getAsJsonArray().get(i);
                 Main.instance.getDatabase().addLinkIfNotExists(

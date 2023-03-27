@@ -26,13 +26,9 @@ public class Main {
         this.database = new Database();
 
         String domain = "dl.dropboxusercontent.com";
-        Timestamp ts = new Timestamp(2014, 6, 24, 6, 0, 43);
+        Timestamp ts = new Timestamp(2014, 8, 30, 6, 0, 43);
 
-        System.out.println(ts);
-
-        System.out.println(ts);
-
-        new ScanDomain(domain, ts).startScanning();
+        new ScanDomain(domain, ts, 1000).startScanning();
     }
 
     public static void main(String[] args) {
