@@ -15,8 +15,6 @@ public class ScanDomain {
     private Timestamp timestamp;
     private final int limit;
 
-    private final int defSub = 6;
-
     public ScanDomain(String domain, Timestamp timestamp, int limit) {
         this.domain = domain;
         this.timestamp = timestamp;
@@ -26,16 +24,24 @@ public class ScanDomain {
     public void startScanning() {
         checkForExistingSave();
 
-        int sub = defSub;
+        Timestamp.Time one = null;
+        int num = -1;
 
-        // Make it stop after a certain date, for now it's fine for testing
+        // TODO: Make it stop after a certain date, for now it's fine for testing
         while (true) {
-            if (getLinks(sub)) {
-                if (sub == 14) System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-                sub = sub + 2;
-            } else {
-                sub = defSub;
-                timestamp.plusDays(1);
+            if (getLinks(this.timestamp.getTimeType())) { // If it is larger than the limit
+                // Store what the too large one was
+                one = this.timestamp.getTimeType();
+                num = this.timestamp.get(one);
+
+                //if (sub.getSub() == 14) System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+
+                // Go down one time
+                this.timestamp.setTimeType(this.timestamp.goDownOneTime(this.timestamp.getTimeType()));
+            } else { // If it is smaller than the limit
+                // Go up one time if
+                if (one == this.timestamp.getTimeType() && num == this.timestamp.get(this.timestamp.getTimeType())) this.timestamp.setTimeType(this.timestamp.goUpOneTime(this.timestamp.getTimeType()));
+                this.timestamp.plus(this.timestamp.getTimeType(), 1);
             }
         }
     }
@@ -46,10 +52,10 @@ public class ScanDomain {
         }
     }
 
-    private boolean getLinks(int sub) {
+    private boolean getLinks(Timestamp.Time time) {
         try {
-            System.out.println(new ApiUrlBuilder().setLimit(this.limit).setDomain(this.domain).setFrom(this.timestamp.toString().substring(0, sub)).setTo(this.timestamp.toString().substring(0, sub)).build());
-            String response = readUrl(new ApiUrlBuilder().setLimit(this.limit).setDomain(this.domain).setFrom(this.timestamp.toString().substring(0, sub)).setTo(this.timestamp.toString().substring(0, sub)).build());
+            System.out.println(new ApiUrlBuilder().setLimit(this.limit).setDomain(this.domain).setFrom(this.timestamp.toString().substring(0, time.getSub())).setTo(this.timestamp.toString().substring(0, time.getSub())).build());
+            String response = readUrl(new ApiUrlBuilder().setLimit(this.limit).setDomain(this.domain).setFrom(this.timestamp.toString().substring(0, time.getSub())).setTo(this.timestamp.toString().substring(0, time.getSub())).build());
             JsonElement element = JsonParser.parseString(response);
             System.out.println(element.getAsJsonArray().size());
             if (element.getAsJsonArray().size() >= this.limit) {

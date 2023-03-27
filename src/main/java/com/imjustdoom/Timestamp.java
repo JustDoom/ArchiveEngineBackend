@@ -17,7 +17,9 @@ public class Timestamp {
 
     private LocalDateTime time;
 
-    public Timestamp(int year, int month, int day, int hour, int minute, int second) {
+    private Time timeType;
+
+    public Timestamp(int year, int month, int day, int hour, int minute, int second, Time timeType) {
         this.year = year;
         this.month = month;
         this.day = day;
@@ -26,6 +28,8 @@ public class Timestamp {
         this.second = second;
 
         this.time = LocalDateTime.of(year, month, day, hour, minute, second);
+
+        this.timeType = timeType;
     }
 
     public Timestamp(String timestamp) {
@@ -95,6 +99,62 @@ public class Timestamp {
         getDatesFromDateTime();
     }
 
+    public void plus(Time time, int amount) {
+
+        // Get the current time
+        int current = get(time);
+
+        switch (time) {
+            case YEAR -> plusYears(amount);
+            case MONTH -> plusMonths(amount);
+            case DAY -> plusDays(amount);
+            case HOUR -> plusHours(amount);
+            case MINUTE -> plusMinutes(amount);
+            case SECOND -> plusSeconds(amount);
+        }
+
+        if (get(time) < current) {
+            this.timeType = goUpOneTime(this.timeType);
+        }
+    }
+
+    public Time goDownOneTime(Time time) {
+        return switch (time) {
+            case YEAR -> Time.MONTH;
+            case MONTH -> Time.DAY;
+            case DAY -> Time.HOUR;
+            case HOUR -> Time.MINUTE;
+            case MINUTE -> Time.SECOND;
+            default -> null;
+        };
+    }
+
+    public Time goUpOneTime(Time time) {
+        return switch (time) {
+            case MONTH -> Time.YEAR;
+            case DAY -> Time.MONTH;
+            case HOUR -> Time.DAY;
+            case MINUTE -> Time.HOUR;
+            case SECOND -> Time.MINUTE;
+            default -> null;
+        };
+    }
+
+    public int get(Time time) {
+        return switch (time) {
+            case YEAR -> this.year;
+            case MONTH -> this.month;
+            case DAY -> this.day;
+            case HOUR -> this.hour;
+            case MINUTE -> this.minute;
+            case SECOND -> this.second;
+        };
+    }
+
+    public void setTimeType(Time timeType) {
+        this.timeType = timeType;
+    }
+
     @Override
     public String toString() {
         return String.valueOf(year)
@@ -117,6 +177,10 @@ public class Timestamp {
 
         Time(int sub) {
             this.sub = sub;
+        }
+
+        public int getSub() {
+            return sub;
         }
     }
 }
