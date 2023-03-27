@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.sql.SQLException;
 
 public class ScanDomain {
 
@@ -63,15 +64,21 @@ public class ScanDomain {
             }
 
             // TODO: run on another thread so it can make a request while this is running
-            for (int i = 1; i < element.getAsJsonArray().size(); i++) {
-                JsonElement urlInfo = element.getAsJsonArray().get(i);
-                Main.instance.getDatabase().addLinkIfNotExists(
-                        urlInfo.getAsJsonArray().get(0).getAsString(),
-                        urlInfo.getAsJsonArray().get(1).getAsString(),
-                        urlInfo.getAsJsonArray().get(2).getAsString(),
-                        urlInfo.getAsJsonArray().get(3).getAsString(),
-                        urlInfo.getAsJsonArray().get(5).getAsString());
-            }
+            new Thread(() -> {
+                for (int i = 1; i < element.getAsJsonArray().size(); i++) {
+                    JsonElement urlInfo = element.getAsJsonArray().get(i);
+                    try {
+                        Main.instance.getDatabase().addLinkIfNotExists(
+                                urlInfo.getAsJsonArray().get(0).getAsString(),
+                                urlInfo.getAsJsonArray().get(1).getAsString(),
+                                urlInfo.getAsJsonArray().get(2).getAsString(),
+                                urlInfo.getAsJsonArray().get(3).getAsString(),
+                                urlInfo.getAsJsonArray().get(5).getAsString());
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }).start();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
