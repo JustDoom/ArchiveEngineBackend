@@ -85,7 +85,7 @@ public class ScanDomain {
                 }
             //}).start();
         } catch (Exception exception) {
-            exception.printStackTrace();
+            this.urlService.addFailedRequest(this.timestamp.toString(), this.timestamp.getTimeType(), this.domainModel);
         }
 
         return false;

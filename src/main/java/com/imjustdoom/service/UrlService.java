@@ -1,9 +1,12 @@
 package com.imjustdoom.service;
 
+import com.imjustdoom.Timestamp;
 import com.imjustdoom.dto.out.SimpleUrlResponse;
 import com.imjustdoom.model.Domain;
+import com.imjustdoom.model.FailedRequest;
 import com.imjustdoom.model.Url;
 import com.imjustdoom.repository.DomainRepository;
+import com.imjustdoom.repository.FailedRequestRepository;
 import com.imjustdoom.repository.UrlRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +23,7 @@ import java.util.stream.Collectors;
 public class UrlService {
 
     private final UrlRepository urlRepository;
+    private final FailedRequestRepository failedRequestRepository;
     private final DomainRepository domainRepository;
 
     public List<SimpleUrlResponse> search(String query) {
@@ -30,6 +34,12 @@ public class UrlService {
         if (this.urlRepository.existsByUrlAndMimeTypeAndTimestampAndEndTimestampAndStatusCode(url, mimeType, timestamp, endTimestamp, statusCode)) return;
         Url url1 = new Url(url, mimeType, timestamp, endTimestamp, statusCode, domain);
         this.urlRepository.save(url1);
+    }
+
+    public void addFailedRequest(String timestamp, Timestamp.Time time, Domain domain) {
+        if (this.failedRequestRepository.existsByTimestampAndDomain(timestamp, domain)) return;
+        FailedRequest failedRequest = new FailedRequest(timestamp, time, domain);
+        this.failedRequestRepository.save(failedRequest);
     }
 
     public boolean domainExists(String domain) {
