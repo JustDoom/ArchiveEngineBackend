@@ -15,6 +15,6 @@ public class Runner implements CommandLineRunner {
     public void run(String... args) {
         Timestamp ts = new Timestamp(2014, 1, 1, 0, 0, 0, Timestamp.Time.HOUR);
 
-        new ScanDomain("dl.dropboxusercontent.com", ts, 100, this.urlService).startScanning();
+        new ScanDomain("dl.dropboxusercontent.com", ts, 10000, this.urlService).startScanning();
     }
 }
