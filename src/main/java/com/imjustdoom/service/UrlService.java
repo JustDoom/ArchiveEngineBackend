@@ -27,6 +27,7 @@ public class UrlService {
     }
 
     public void addUrl(String url, String mimeType, String timestamp, String endTimestamp, String statusCode, Domain domain) {
+        if (this.urlRepository.existsByUrlAndMimeTypeAndTimestampAndEndTimestampAndStatusCode(url, mimeType, timestamp, endTimestamp, statusCode)) return;
         Url url1 = new Url(url, mimeType, timestamp, endTimestamp, statusCode, domain);
         this.urlRepository.save(url1);
     }

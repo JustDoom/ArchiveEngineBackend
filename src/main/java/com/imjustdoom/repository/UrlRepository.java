@@ -15,4 +15,6 @@ public interface UrlRepository extends JpaRepository<Url, Long> {
     boolean existsById(long id);
 
     List<Url> findAllByUrlIsContainingIgnoreCase(String keyword);
+
+    boolean existsByUrlAndMimeTypeAndTimestampAndEndTimestampAndStatusCode(String url, String mimeType, String timestamp, String endTimestamp, String statusCode);
 }
