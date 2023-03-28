@@ -2,11 +2,13 @@ package com.imjustdoom;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.imjustdoom.model.Domain;
+import com.imjustdoom.service.UrlService;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.sql.SQLException;
+import java.util.Optional;
 
 public class ScanDomain {
 
@@ -15,15 +17,27 @@ public class ScanDomain {
     private final String domain;
     private Timestamp timestamp;
     private final int limit;
+    private final Domain domainModel;
 
-    public ScanDomain(String domain, Timestamp timestamp, int limit) {
+    private final UrlService urlService;
+
+    public ScanDomain(String domain, Timestamp timestamp, int limit, UrlService urlService) {
         this.domain = domain;
         this.timestamp = timestamp;
         this.limit = limit;
+        this.urlService = urlService;
+
+        Optional<Domain> domainOptional = this.urlService.getDomain(domain);
+        if (domainOptional.isEmpty()) {
+            this.urlService.addDomain(domain);
+            this.domainModel = this.urlService.getDomain(domain).get();
+        } else {
+            this.domainModel = domainOptional.get();
+        }
     }
 
     public void startScanning() {
-        checkForExistingSave();
+        //checkForExistingSave();
 
         Timestamp.Time one = null;
         int num = -1;
@@ -47,12 +61,6 @@ public class ScanDomain {
         }
     }
 
-    private void checkForExistingSave() {
-        if (Main.instance.getSaving().getDomain().equals(this.domain)) {
-            this.timestamp = new Timestamp(Main.instance.getSaving().getTimestamp());
-        }
-    }
-
     private boolean getLinks(Timestamp.Time time) {
         try {
             System.out.println(new ApiUrlBuilder().setLimit(this.limit).setDomain(this.domain).setFrom(this.timestamp.toString().substring(0, time.getSub())).setTo(this.timestamp.toString().substring(0, time.getSub())).build());
@@ -67,16 +75,13 @@ public class ScanDomain {
             //new Thread(() -> {
                 for (int i = 1; i < element.getAsJsonArray().size(); i++) {
                     JsonElement urlInfo = element.getAsJsonArray().get(i);
-                    try {
-                        Main.instance.getDatabase().addLinkIfNotExists(
-                                urlInfo.getAsJsonArray().get(0).getAsString(),
-                                urlInfo.getAsJsonArray().get(1).getAsString(),
-                                urlInfo.getAsJsonArray().get(2).getAsString(),
-                                urlInfo.getAsJsonArray().get(3).getAsString(),
-                                urlInfo.getAsJsonArray().get(5).getAsString());
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
+                    this.urlService.addUrl(urlInfo.getAsJsonArray().get(0).getAsString(), urlInfo.getAsJsonArray().get(1).getAsString(), urlInfo.getAsJsonArray().get(2).getAsString(), urlInfo.getAsJsonArray().get(3).getAsString(), urlInfo.getAsJsonArray().get(5).getAsString(), this.domainModel);
+//                        Main.instance.getDatabase().addLinkIfNotExists(
+//                                urlInfo.getAsJsonArray().get(0).getAsString(),
+//                                urlInfo.getAsJsonArray().get(1).getAsString(),
+//                                urlInfo.getAsJsonArray().get(2).getAsString(),
+//                                urlInfo.getAsJsonArray().get(3).getAsString(),
+//                                urlInfo.getAsJsonArray().get(5).getAsString());
                 }
             //}).start();
         } catch (Exception exception) {

@@ -1,7 +1,5 @@
 package com.imjustdoom;
 
-import lombok.Setter;
-
 public class ApiUrlBuilder {
 
     private final String apiUrl = "https://web.archive.org/web/timemap/json?url=";

@@ -1,0 +1,45 @@
+package com.imjustdoom.service;
+
+import com.imjustdoom.dto.out.SimpleUrlResponse;
+import com.imjustdoom.model.Domain;
+import com.imjustdoom.model.Url;
+import com.imjustdoom.repository.DomainRepository;
+import com.imjustdoom.repository.UrlRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Validated
+@Service
+@RequiredArgsConstructor
+public class UrlService {
+
+    private final UrlRepository urlRepository;
+    private final DomainRepository domainRepository;
+
+    public List<SimpleUrlResponse> search(String query) {
+        return this.urlRepository.findAllByUrlIsContainingIgnoreCase(query).stream().map(url -> new SimpleUrlResponse(url.getUrl())).toList();
+    }
+
+    public void addUrl(String url, String mimeType, String timestamp, String endTimestamp, String statusCode, Domain domain) {
+        Url url1 = new Url(url, mimeType, timestamp, endTimestamp, statusCode, domain);
+        this.urlRepository.save(url1);
+    }
+
+    public boolean domainExists(String domain) {
+        return this.domainRepository.existsByDomain(domain);
+    }
+
+    public void addDomain(String domain) {
+        this.domainRepository.save(new Domain(domain));
+    }
+
+    public Optional<Domain> getDomain(String domain) {
+        return this.domainRepository.findByDomain(domain);
+    }
+}
