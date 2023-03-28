@@ -27,6 +27,7 @@ public class ScanDomain {
         this.limit = limit;
         this.urlService = urlService;
 
+        // Create the domain in the database if it doesn't exist
         Optional<Domain> domainOptional = this.urlService.getDomain(domain);
         if (domainOptional.isEmpty()) {
             this.urlService.addDomain(domain);
@@ -37,11 +38,11 @@ public class ScanDomain {
     }
 
     public void startScanning() {
-        //checkForExistingSave();
 
         Timestamp.Time one = null;
         int num = -1;
 
+        // super messy, gotta fix it
         // TODO: Make it stop after a certain date, for now it's fine for testing
         while (true) {
             if (getLinks(this.timestamp.getTimeType())) { // If it is larger than the limit
@@ -49,13 +50,12 @@ public class ScanDomain {
                 one = this.timestamp.getTimeType();
                 num = this.timestamp.get(one);
 
-                //if (sub.getSub() == 14) System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-
                 // Go down one time
                 this.timestamp.setTimeType(this.timestamp.goDownOneTime(this.timestamp.getTimeType()));
             } else { // If it is smaller than the limit
                 // Go up one time if
-                if (one == this.timestamp.getTimeType() && num == this.timestamp.get(this.timestamp.getTimeType())) this.timestamp.setTimeType(this.timestamp.goUpOneTime(this.timestamp.getTimeType()));
+                if (one == this.timestamp.getTimeType() && num == this.timestamp.get(this.timestamp.getTimeType()))
+                    this.timestamp.setTimeType(this.timestamp.goUpOneTime(this.timestamp.getTimeType()));
                 this.timestamp.plus(this.timestamp.getTimeType(), 1);
             }
 
@@ -67,29 +67,19 @@ public class ScanDomain {
 
     private boolean getLinks(Timestamp.Time time) {
         try {
-            System.out.println(new ApiUrlBuilder().setLimit(this.limit).setDomain(this.domain).setFrom(this.timestamp.toString().substring(0, time.getSub())).setTo(this.timestamp.toString().substring(0, time.getSub())).build());
             String response = readUrl(new ApiUrlBuilder().setLimit(this.limit).setDomain(this.domain).setFrom(this.timestamp.toString().substring(0, time.getSub())).setTo(this.timestamp.toString().substring(0, time.getSub())).build());
             JsonElement element = JsonParser.parseString(response);
-            System.out.println(element.getAsJsonArray().size());
+
             if (element.getAsJsonArray().size() >= this.limit) {
                 return true;
             }
 
             // TODO: run on another thread so it can make a request while this is running
-            //new Thread(() -> {
-                for (int i = 1; i < element.getAsJsonArray().size(); i++) {
-                    JsonElement urlInfo = element.getAsJsonArray().get(i);
-                    this.urlService.addUrl(urlInfo.getAsJsonArray().get(0).getAsString(), urlInfo.getAsJsonArray().get(1).getAsString(), urlInfo.getAsJsonArray().get(2).getAsString(), urlInfo.getAsJsonArray().get(3).getAsString(), urlInfo.getAsJsonArray().get(5).getAsString(), this.domainModel);
-//                        Main.instance.getDatabase().addLinkIfNotExists(
-//                                urlInfo.getAsJsonArray().get(0).getAsString(),
-//                                urlInfo.getAsJsonArray().get(1).getAsString(),
-//                                urlInfo.getAsJsonArray().get(2).getAsString(),
-//                                urlInfo.getAsJsonArray().get(3).getAsString(),
-//                                urlInfo.getAsJsonArray().get(5).getAsString());
-                }
-            //}).start();
+            for (int i = 1; i < element.getAsJsonArray().size(); i++) {
+                JsonElement urlInfo = element.getAsJsonArray().get(i);
+                this.urlService.addUrl(urlInfo.getAsJsonArray().get(0).getAsString(), urlInfo.getAsJsonArray().get(1).getAsString(), urlInfo.getAsJsonArray().get(2).getAsString(), urlInfo.getAsJsonArray().get(3).getAsString(), urlInfo.getAsJsonArray().get(5).getAsString(), this.domainModel);
+            }
         } catch (Exception exception) {
-            exception.printStackTrace();
             this.urlService.addFailedRequest(this.timestamp.toString(), this.timestamp.getTimeType(), this.domainModel);
         }
 

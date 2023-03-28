@@ -13,8 +13,6 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 @AllArgsConstructor
 public class ArchiveEngineApplication {
 
-    private final UrlService urlService;
-
     public static void main(String[] args) {
         SpringApplication.run(ArchiveEngineApplication.class, args);
     }
