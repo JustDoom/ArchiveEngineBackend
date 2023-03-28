@@ -13,7 +13,7 @@ public class Runner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        Timestamp ts = new Timestamp(2014, 1, 1, 0, 0, 0, Timestamp.Time.HOUR);
+        Timestamp ts = new Timestamp(2014, 1, 1, 0, 0, 0, Timestamp.Time.MONTH);
 
         new ScanDomain("dl.dropboxusercontent.com", ts, 10000, this.urlService).startScanning();
     }
