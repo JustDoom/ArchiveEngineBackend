@@ -58,6 +58,10 @@ public class ScanDomain {
                 if (one == this.timestamp.getTimeType() && num == this.timestamp.get(this.timestamp.getTimeType())) this.timestamp.setTimeType(this.timestamp.goUpOneTime(this.timestamp.getTimeType()));
                 this.timestamp.plus(this.timestamp.getTimeType(), 1);
             }
+
+            this.domainModel.setTime(this.timestamp.getTimeType());
+            this.domainModel.setTimestamp(this.timestamp.toString());
+            this.urlService.saveDomain(this.domainModel);
         }
     }
 
@@ -85,6 +89,7 @@ public class ScanDomain {
                 }
             //}).start();
         } catch (Exception exception) {
+            exception.printStackTrace();
             this.urlService.addFailedRequest(this.timestamp.toString(), this.timestamp.getTimeType(), this.domainModel);
         }
 

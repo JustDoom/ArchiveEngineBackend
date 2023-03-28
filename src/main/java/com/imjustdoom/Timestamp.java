@@ -32,7 +32,7 @@ public class Timestamp {
         this.timeType = timeType;
     }
 
-    public Timestamp(String timestamp) {
+    public Timestamp(String timestamp, Time timeType) {
         String year = timestamp.substring(0, 4);
         String month = timestamp.substring(4, 6);
         String day = timestamp.substring(6, 8);
@@ -48,6 +48,8 @@ public class Timestamp {
         this.hour = this.time.getHour();
         this.minute = this.time.getMinute();
         this.second = this.time.getSecond();
+
+        this.timeType = timeType;
     }
 
     private void getDatesFromDateTime() {

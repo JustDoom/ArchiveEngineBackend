@@ -53,4 +53,8 @@ public class UrlService {
     public Optional<Domain> getDomain(String domain) {
         return this.domainRepository.findByDomain(domain);
     }
+
+    public void saveDomain(Domain domain) {
+        this.domainRepository.save(domain);
+    }
 }

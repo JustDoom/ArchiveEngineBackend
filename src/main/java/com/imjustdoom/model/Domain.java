@@ -1,5 +1,6 @@
 package com.imjustdoom.model;
 
+import com.imjustdoom.Timestamp;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,8 +22,17 @@ public class Domain {
     @Column(nullable = false, unique = true)
     private String domain;
 
+    @Column
+    private String timestamp;
+
+    @Column
+    private Timestamp.Time time;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "domain")
     private List<Url> urls = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "domain")
+    private List<FailedRequest> failedRequests = new ArrayList<>();
 
     public Domain(String domain) {
         this.domain = domain;
