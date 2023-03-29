@@ -65,4 +65,8 @@ public class UrlService {
     public void saveDomain(Domain domain) {
         this.domainRepository.save(domain);
     }
+
+    public List<FailedRequest> getFailedUrls() {
+        return this.failedRequestRepository.findAll();
+    }
 }

@@ -3,6 +3,7 @@ package com.imjustdoom;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.imjustdoom.model.Domain;
+import com.imjustdoom.model.FailedRequest;
 import com.imjustdoom.model.Url;
 import com.imjustdoom.service.UrlService;
 
@@ -47,10 +48,32 @@ public class ScanDomain {
         Timestamp.Time one = null;
         int num = -1;
 
+        // try the ones that failed again
+        List<FailedRequest> failedUrls = this.urlService.getFailedUrls();
+        for (FailedRequest failedRequest : failedUrls) {
+            System.out.println("Trying failed request: " + failedRequest.getTimestamp() + " " + failedRequest.getTime() + " " + failedRequest.getDomain().getDomain());
+            if (getLinks(failedRequest.getDomain().getDomain(), failedRequest.getTimestamp().substring(0, failedRequest.getTime().getSub()), failedRequest.getTime())) {
+                // Store what the too large one was
+                one = this.timestamp.getTimeType();
+                num = this.timestamp.get(one);
+
+                // Go down one time
+                this.timestamp.setTimeType(this.timestamp.goDownOneTime(this.timestamp.getTimeType()));
+            } else { // If it is smaller than the limit
+                // Go up one time if
+                if (one == this.timestamp.getTimeType() && num == this.timestamp.get(this.timestamp.getTimeType()))
+                    this.timestamp.setTimeType(this.timestamp.goUpOneTime(this.timestamp.getTimeType()));
+                this.timestamp.plus(this.timestamp.getTimeType(), 1);
+            }
+        }
+
+        one = null;
+        num = -1;
+
         // super messy, gotta fix it
         // TODO: Make it stop after a certain date, for now it's fine for testing
         while (true) {
-            if (getLinks(this.timestamp.getTimeType())) { // If it is larger than the limit
+            if (getLinks(this.domain, this.timestamp.toString().substring(0, this.timestamp.getTimeType().getSub()), this.timestamp.getTimeType())) { // If it is larger than the limit
                 // Store what the too large one was
                 one = this.timestamp.getTimeType();
                 num = this.timestamp.get(one);
@@ -70,9 +93,9 @@ public class ScanDomain {
         }
     }
 
-    private boolean getLinks(Timestamp.Time time) {
+    private boolean getLinks(String domain, String timestamp, Timestamp.Time time) {
         try {
-            String url = new ApiUrlBuilder().setLimit(this.limit).setDomain(this.domain).setFrom(this.timestamp.toString().substring(0, time.getSub())).setTo(this.timestamp.toString().substring(0, time.getSub())).build();
+            String url = new ApiUrlBuilder().setLimit(this.limit).setDomain(domain).setFrom(timestamp).setTo(timestamp).build();
             System.out.println(url);
             String response = readUrl(url);
             JsonElement element = JsonParser.parseString(response);
