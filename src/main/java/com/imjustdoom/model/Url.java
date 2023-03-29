@@ -8,6 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"url", "mimeType", "timestamp", "endTimestamp", "statusCode", "domain_id"}))
 @NoArgsConstructor
 public class Url {
 

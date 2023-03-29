@@ -36,6 +36,14 @@ public class UrlService {
         this.urlRepository.save(url1);
     }
 
+    public boolean checkIfUrlExists(Url url) {
+        return this.urlRepository.existsByUrlAndMimeTypeAndTimestampAndEndTimestampAndStatusCode(url.getUrl(), url.getMimeType(), url.getTimestamp(), url.getEndTimestamp(), url.getStatusCode());
+    }
+
+    public void addAllUrl(List<Url> urls) {
+        this.urlRepository.saveAll(urls);
+    }
+
     public void addFailedRequest(String timestamp, Timestamp.Time time, Domain domain) {
         if (this.failedRequestRepository.existsByTimestampAndDomain(timestamp, domain)) return;
         FailedRequest failedRequest = new FailedRequest(timestamp, time, domain);

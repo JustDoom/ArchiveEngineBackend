@@ -3,11 +3,16 @@ package com.imjustdoom;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.imjustdoom.model.Domain;
+import com.imjustdoom.model.Url;
 import com.imjustdoom.service.UrlService;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class ScanDomain {
@@ -67,19 +72,29 @@ public class ScanDomain {
 
     private boolean getLinks(Timestamp.Time time) {
         try {
-            String response = readUrl(new ApiUrlBuilder().setLimit(this.limit).setDomain(this.domain).setFrom(this.timestamp.toString().substring(0, time.getSub())).setTo(this.timestamp.toString().substring(0, time.getSub())).build());
+            String url = new ApiUrlBuilder().setLimit(this.limit).setDomain(this.domain).setFrom(this.timestamp.toString().substring(0, time.getSub())).setTo(this.timestamp.toString().substring(0, time.getSub())).build();
+            System.out.println(url);
+            String response = readUrl(url);
             JsonElement element = JsonParser.parseString(response);
+
+            System.out.println(element.getAsJsonArray().size());
 
             if (element.getAsJsonArray().size() >= this.limit) {
                 return true;
             }
 
+            List<Url> urlList = new ArrayList<>();
             // TODO: run on another thread so it can make a request while this is running
             for (int i = 1; i < element.getAsJsonArray().size(); i++) {
                 JsonElement urlInfo = element.getAsJsonArray().get(i);
-                this.urlService.addUrl(urlInfo.getAsJsonArray().get(0).getAsString(), urlInfo.getAsJsonArray().get(1).getAsString(), urlInfo.getAsJsonArray().get(2).getAsString(), urlInfo.getAsJsonArray().get(3).getAsString(), urlInfo.getAsJsonArray().get(5).getAsString(), this.domainModel);
+                Url u = new Url(urlInfo.getAsJsonArray().get(0).getAsString(), urlInfo.getAsJsonArray().get(1).getAsString(), urlInfo.getAsJsonArray().get(2).getAsString(), urlInfo.getAsJsonArray().get(3).getAsString(), urlInfo.getAsJsonArray().get(5).getAsString(), this.domainModel);
+                if (this.urlService.checkIfUrlExists(u)) continue;
+                urlList.add(u);
             }
+
+            this.urlService.addAllUrl(urlList);
         } catch (Exception exception) {
+            exception.printStackTrace();
             this.urlService.addFailedRequest(this.timestamp.toString(), this.timestamp.getTimeType(), this.domainModel);
         }
 
@@ -90,7 +105,14 @@ public class ScanDomain {
         BufferedReader reader = null;
         try {
             URL url = new URL(urlString);
-            reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+            HttpURLConnection.setFollowRedirects(false);
+            huc.setConnectTimeout(60 * 1000);
+            huc.setRequestMethod("GET");
+            huc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 (.NET CLR 3.5.30729)");
+            huc.connect();
+            InputStream input = huc.getInputStream();
+            reader = new BufferedReader(new InputStreamReader(input));
             StringBuilder buffer = new StringBuilder();
             int read;
             char[] chars = new char[1024];
