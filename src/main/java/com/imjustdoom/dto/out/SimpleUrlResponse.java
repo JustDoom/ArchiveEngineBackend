@@ -10,4 +10,7 @@ import lombok.Setter;
 public class SimpleUrlResponse {
 
     private String url;
+    private String timestamp;
+    private String mimeType;
+    private String statusCode;
 }

@@ -27,7 +27,7 @@ public class UrlService {
     private final DomainRepository domainRepository;
 
     public List<SimpleUrlResponse> search(String query) {
-        return this.urlRepository.findAllByUrlIsContainingIgnoreCase(query).stream().map(url -> new SimpleUrlResponse(url.getUrl())).toList();
+        return this.urlRepository.findAllByUrlIsContainingIgnoreCase(query).stream().map(url -> new SimpleUrlResponse(url.getUrl(), url.getTimestamp(), url.getMimeType(), url.getStatusCode())).toList();
     }
 
     public void addUrl(String url, String mimeType, String timestamp, String endTimestamp, String statusCode, Domain domain) {
