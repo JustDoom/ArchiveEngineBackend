@@ -88,7 +88,7 @@ public class ScanDomain {
             for (int i = 1; i < element.getAsJsonArray().size(); i++) {
                 JsonElement urlInfo = element.getAsJsonArray().get(i);
                 Url u = new Url(urlInfo.getAsJsonArray().get(0).getAsString(), urlInfo.getAsJsonArray().get(1).getAsString(), urlInfo.getAsJsonArray().get(2).getAsString(), urlInfo.getAsJsonArray().get(3).getAsString(), urlInfo.getAsJsonArray().get(5).getAsString(), this.domainModel);
-                if (this.urlService.checkIfUrlExists(u)) continue;
+                //if (this.urlService.checkIfUrlExists(u)) continue;
                 urlList.add(u);
             }
 
