@@ -1,4 +1,7 @@
 # ArchiveEngine
+
+[![Discord Server](https://img.shields.io/discord/979589333524820018?color=7289da&label=MY%20DISCORD&style=flat-square&logo=appveyor)](https://discord.gg/ydGK5jYV6t)
+[![Discord Server](https://img.shields.io/discord/979589333524820018?color=7289da&label=MY%20ARCHIVE%20DISCORD&style=flat-square&logo=appveyor)](https://discord.gg/k8RcgxpnBS)
  
 This is a project to store all the archived links in the wayback machine in a place they can be searched through.  
 When running this it can take a while to get the response so please wait a while.
@@ -14,3 +17,24 @@ Archive.org/The wayback machine is an amazing service but they are really lackin
 ## How it works
 
 This indexes the links by making requests to the limited API they have. It makes a request to certain timeframes to get managble chunks of links, I can remove the 10k url limit but I don't want to kill archive.org or be blocked.
+
+This project contains two parts, the indexer and the actual API. The indexer is the part that indexes the links and stores them in the database. The API allows you to make requests and search the database for certain links.
+
+## TODO
+
+General feature TODO, doesn't include code cleanups, small fixes and stuff.
+
+### API
+- [x] Basic way to search for links
+- [ ] Return the link along with the timestamp, mimetype and status code
+- [ ] Allow searching with options/filters
+
+### Indexer
+
+- [x] Indexing of links from a certain domain
+- [x] Increment the timestamp automatically when a request is done
+- [ ] Re-try indexing of failed requests (Usually 504 errors)
+- [ ] Stop indexing at a certain date
+- [ ] Allow controlling of basic features (If indexer is running, domain to index, start timestamp?) with startup arguments
+- [ ] Allow indexing of multiple domains at once. Not sure of the request limit to archive.org's API
+- [ ] Stop duplicate links, links can be in it multiple times (links that change like domain.com/latestDownload) but not if everything is the same (timestamp, link, mimeType, status code etc) as it would be the exact same link.
