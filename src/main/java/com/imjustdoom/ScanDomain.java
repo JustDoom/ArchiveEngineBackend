@@ -48,24 +48,24 @@ public class ScanDomain {
         Timestamp.Time one = null;
         int num = -1;
 
-        // try the ones that failed again
-        List<FailedRequest> failedUrls = this.urlService.getFailedUrls();
-        for (FailedRequest failedRequest : failedUrls) {
-            System.out.println("Trying failed request: " + failedRequest.getTimestamp() + " " + failedRequest.getTime() + " " + failedRequest.getDomain().getDomain());
-            if (getLinks(failedRequest.getDomain().getDomain(), failedRequest.getTimestamp().substring(0, failedRequest.getTime().getSub()), failedRequest.getTime())) {
-                // Store what the too large one was
-                one = this.timestamp.getTimeType();
-                num = this.timestamp.get(one);
-
-                // Go down one time
-                this.timestamp.setTimeType(this.timestamp.goDownOneTime(this.timestamp.getTimeType()));
-            } else { // If it is smaller than the limit
-                // Go up one time if
-                if (one == this.timestamp.getTimeType() && num == this.timestamp.get(this.timestamp.getTimeType()))
-                    this.timestamp.setTimeType(this.timestamp.goUpOneTime(this.timestamp.getTimeType()));
-                this.timestamp.plus(this.timestamp.getTimeType(), 1);
-            }
-        }
+//        // try the ones that failed again
+//        List<FailedRequest> failedUrls = this.urlService.getFailedUrls();
+//        for (FailedRequest failedRequest : failedUrls) {
+//            System.out.println("Trying failed request: " + failedRequest.getTimestamp() + " " + failedRequest.getTime() + " " + failedRequest.getDomain().getDomain());
+//            if (getLinks(failedRequest.getDomain().getDomain(), failedRequest.getTimestamp().substring(0, failedRequest.getTime().getSub()), failedRequest.getTime())) {
+//                // Store what the too large one was
+//                one = this.timestamp.getTimeType();
+//                num = this.timestamp.get(one);
+//
+//                // Go down one time
+//                this.timestamp.setTimeType(this.timestamp.goDownOneTime(this.timestamp.getTimeType()));
+//            } else { // If it is smaller than the limit
+//                // Go up one time if
+//                if (one == this.timestamp.getTimeType() && num == this.timestamp.get(this.timestamp.getTimeType()))
+//                    this.timestamp.setTimeType(this.timestamp.goUpOneTime(this.timestamp.getTimeType()));
+//                this.timestamp.plus(this.timestamp.getTimeType(), 1);
+//            }
+//        }
 
         one = null;
         num = -1;
@@ -73,7 +73,7 @@ public class ScanDomain {
         // super messy, gotta fix it
         // TODO: Make it stop after a certain date, for now it's fine for testing
         while (true) {
-            if (getLinks(this.domain, this.timestamp.toString().substring(0, this.timestamp.getTimeType().getSub()), this.timestamp.getTimeType())) { // If it is larger than the limit
+            if (getLinks(this.domain, this.timestamp.toString().substring(0, this.timestamp.getTimeType().getSub()))) { // If it is larger than the limit
                 // Store what the too large one was
                 one = this.timestamp.getTimeType();
                 num = this.timestamp.get(one);
@@ -93,7 +93,7 @@ public class ScanDomain {
         }
     }
 
-    private boolean getLinks(String domain, String timestamp, Timestamp.Time time) {
+    private boolean getLinks(String domain, String timestamp) {
         try {
             String url = new ApiUrlBuilder().setLimit(this.limit).setDomain(domain).setFrom(timestamp).setTo(timestamp).build();
             System.out.println(url);
