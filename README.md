@@ -27,6 +27,7 @@ General feature TODO, doesn't include code cleanups, small fixes and stuff.
 ### API
 - [x] Basic way to search for links
 - [x] Return the link along with the timestamp, mimetype and status code
+- [x] A way to sort by the stored information (timestamp, mimetype, status code and url)
 - [ ] Allow searching with options/filters
 - [ ] Add link pagination
 

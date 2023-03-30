@@ -9,6 +9,8 @@ import com.imjustdoom.repository.DomainRepository;
 import com.imjustdoom.repository.FailedRequestRepository;
 import com.imjustdoom.repository.UrlRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -26,8 +28,9 @@ public class UrlService {
     private final FailedRequestRepository failedRequestRepository;
     private final DomainRepository domainRepository;
 
-    public List<SimpleUrlResponse> search(String query) {
-        return this.urlRepository.findAllByUrlIsContainingIgnoreCase(query).stream().map(url -> new SimpleUrlResponse(url.getUrl(), url.getTimestamp(), url.getMimeType(), url.getStatusCode())).toList();
+    public List<SimpleUrlResponse> search(String query, String page, String sortBy, String ascending) {
+        return this.urlRepository.findAllByUrlIsContainingIgnoreCase(query, PageRequest.of(Integer.parseInt(page), 50, Boolean.parseBoolean(ascending) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending()))
+                .stream().map(url -> new SimpleUrlResponse(url.getUrl(), url.getTimestamp(), url.getMimeType(), url.getStatusCode())).toList();
     }
 
     public void addUrl(String url, String mimeType, String timestamp, String endTimestamp, String statusCode, Domain domain) {
