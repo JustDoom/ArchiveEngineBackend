@@ -17,6 +17,7 @@ public class SearchController {
 
     @GetMapping()
     public ResponseEntity<?> search(@RequestParam("query") String query) {
+        if (query == null || query.isEmpty()) return ResponseEntity.badRequest().body("Query cannot be empty");
         return ResponseEntity.ok().body(this.urlService.search(query));
     }
 }
