@@ -31,7 +31,7 @@ public class UrlService {
     public ResponseEntity<?> searchChecks(String query, String page, String sortBy, String ascending) {
         if (query == null || query.isEmpty()) return ResponseEntity.badRequest().body("Query cannot be empty");
         if (!page.matches("[0-9]+")) return ResponseEntity.badRequest().body("Page must be a number");
-        if (!sortBy.matches("timestamp|url|mimetype|statuscode")) return ResponseEntity.badRequest().body("sortBy must be either timestamp, mimetype, statuscode or url");
+        if (!sortBy.matches("(?i)timestamp|url|mimetype|statuscode")) return ResponseEntity.badRequest().body("sortBy must be either timestamp, mimeType, statusCode or url");
         if (!ascending.matches("true|false")) return ResponseEntity.badRequest().body("ascending must be either true or false");
 
         return ResponseEntity.ok().body(search(query, page, sortBy, ascending));
