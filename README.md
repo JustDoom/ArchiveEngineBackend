@@ -1,6 +1,6 @@
 # ArchiveEngine
 
-[![Discord Server](https://img.shields.io/discord/979589333524820018?color=7289da&label=MY%20DISCORD&style=flat-square&logo=appveyor)](https://discord.gg/ydGK5jYV6t)
+[![Discord Server](https://img.shields.io/discord/810752039470235688?color=7289da&label=MY%20DISCORD&style=flat-square&logo=appveyor)](https://discord.gg/ydGK5jYV6t)
 [![Discord Server](https://img.shields.io/discord/979589333524820018?color=7289da&label=MY%20ARCHIVE%20DISCORD&style=flat-square&logo=appveyor)](https://discord.gg/k8RcgxpnBS)
  
 This is a project to store all the archived links in the wayback machine in a place they can be searched through.  
