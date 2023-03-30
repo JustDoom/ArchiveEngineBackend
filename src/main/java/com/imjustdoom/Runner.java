@@ -19,6 +19,7 @@ public class Runner implements CommandLineRunner {
 
         String domain = "";
         String timestamp = "20000101000000";
+        String stopIndexingTimestamp = "99990101000000";
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
@@ -28,6 +29,7 @@ public class Runner implements CommandLineRunner {
                 }
                 case "--domain" -> domain = args[i + 1];
                 case "--timestamp" -> timestamp = args[i +  1];
+                case "--stopIndexingTimestamp" -> stopIndexingTimestamp = args[i + 1];
             }
         }
 
@@ -48,6 +50,6 @@ public class Runner implements CommandLineRunner {
         }
 
         // Create the indexer
-        new ScanDomain(domain, ts, 10000, this.urlService).startScanning();
+        new IndexDomain(domain, ts, stopIndexingTimestamp, 10000, this.urlService).startScanning();
     }
 }

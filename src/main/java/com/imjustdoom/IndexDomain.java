@@ -3,7 +3,6 @@ package com.imjustdoom;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.imjustdoom.model.Domain;
-import com.imjustdoom.model.FailedRequest;
 import com.imjustdoom.model.Url;
 import com.imjustdoom.service.UrlService;
 
@@ -16,20 +15,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ScanDomain {
+public class IndexDomain {
 
     private final String apiUrl = "https://web.archive.org/web/timemap/json?url=dl.dropboxusercontent.com";
 
     private final String domain;
-    private Timestamp timestamp;
+    private final Timestamp timestamp;
+    private final String stopIndexingTimestamp;
     private final int limit;
     private final Domain domainModel;
 
     private final UrlService urlService;
 
-    public ScanDomain(String domain, Timestamp timestamp, int limit, UrlService urlService) {
+    public IndexDomain(String domain, Timestamp timestamp, String stopIndexingTimestamp, int limit, UrlService urlService) {
         this.domain = domain;
         this.timestamp = timestamp;
+        this.stopIndexingTimestamp = stopIndexingTimestamp;
         this.limit = limit;
         this.urlService = urlService;
 
@@ -72,7 +73,7 @@ public class ScanDomain {
 
         // super messy, gotta fix it
         // TODO: Make it stop after a certain date, for now it's fine for testing
-        while (true) {
+        while (!this.timestamp.toString().equals(stopIndexingTimestamp)) {
             if (getLinks(this.domain, this.timestamp.toString().substring(0, this.timestamp.getTimeType().getSub()))) { // If it is larger than the limit
                 // Store what the too large one was
                 one = this.timestamp.getTimeType();
@@ -115,7 +116,12 @@ public class ScanDomain {
                 urlList.add(u);
             }
 
+            response = null;
+            element = null;
+
             this.urlService.addAllUrl(urlList);
+
+            urlList.clear();
         } catch (Exception exception) {
             exception.printStackTrace();
             this.urlService.addFailedRequest(this.timestamp.toString(), this.timestamp.getTimeType(), this.domainModel);
