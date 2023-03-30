@@ -28,6 +28,15 @@ public class UrlService {
     private final FailedRequestRepository failedRequestRepository;
     private final DomainRepository domainRepository;
 
+    public ResponseEntity<?> searchChecks(String query, String page, String sortBy, String ascending) {
+        if (query == null || query.isEmpty()) return ResponseEntity.badRequest().body("Query cannot be empty");
+        if (!page.matches("[0-9]+")) return ResponseEntity.badRequest().body("Page must be a number");
+        if (!sortBy.matches("timestamp|url|mimetype|statuscode")) return ResponseEntity.badRequest().body("sortBy must be either timestamp, mimetype, statuscode or url");
+        if (!ascending.matches("true|false")) return ResponseEntity.badRequest().body("ascending must be either true or false");
+
+        return ResponseEntity.ok().body(search(query, page, sortBy, ascending));
+    }
+
     public List<SimpleUrlResponse> search(String query, String page, String sortBy, String ascending) {
         return this.urlRepository.findAllByUrlIsContainingIgnoreCase(query, PageRequest.of(Integer.parseInt(page), 50, Boolean.parseBoolean(ascending) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending()))
                 .stream().map(url -> new SimpleUrlResponse(url.getUrl(), url.getTimestamp(), url.getMimeType(), url.getStatusCode())).toList();

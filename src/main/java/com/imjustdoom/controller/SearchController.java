@@ -20,7 +20,6 @@ public class SearchController {
                                     @RequestParam(value = "page", required = false, defaultValue = "0") String page,
                                     @RequestParam(value = "sortBy", required = false, defaultValue = "timestamp") String sortBy,
                                     @RequestParam(value = "ascending", required = false, defaultValue = "true") String ascending) {
-        if (query == null || query.isEmpty()) return ResponseEntity.badRequest().body("Query cannot be empty");
-        return ResponseEntity.ok().body(this.urlService.search(query, page, sortBy, ascending));
+        return this.urlService.searchChecks(query, page, sortBy, ascending);
     }
 }
