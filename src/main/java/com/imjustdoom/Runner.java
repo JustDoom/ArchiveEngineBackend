@@ -20,6 +20,7 @@ public class Runner implements CommandLineRunner {
         String domain = "";
         String timestamp = "20000101000000";
         String stopIndexingTimestamp = "99990101000000";
+        boolean timestampOverride = false;
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
@@ -30,6 +31,7 @@ public class Runner implements CommandLineRunner {
                 case "--domain" -> domain = args[i + 1];
                 case "--timestamp" -> timestamp = args[i +  1];
                 case "--stopIndexingTimestamp" -> stopIndexingTimestamp = args[i + 1];
+                case "--timestampOverride" -> timestampOverride = true;
             }
         }
 
@@ -43,7 +45,9 @@ public class Runner implements CommandLineRunner {
         // Check if domain exists and if it does load its data
         Optional<Domain> optionalDomain = this.urlService.getDomain(domain);
         Timestamp ts;
-        if (optionalDomain.isPresent() && optionalDomain.get().getTimestamp() != null && optionalDomain.get().getTime() != null) {
+        if (timestampOverride) {
+            ts = new Timestamp(timestamp, Timestamp.Time.MONTH);
+        } else if (optionalDomain.isPresent() && optionalDomain.get().getTimestamp() != null && optionalDomain.get().getTime() != null) {
             ts = new Timestamp(optionalDomain.get().getTimestamp(), optionalDomain.get().getTime());
         } else {
             ts = new Timestamp(timestamp, Timestamp.Time.MONTH);
