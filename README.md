@@ -29,14 +29,14 @@ General feature TODO, doesn't include code cleanups, small fixes and stuff.
 - [x] Return the link along with the timestamp, mimetype and status code
 - [x] A way to sort by the stored information (timestamp, mimetype, status code and url)
 - [ ] Allow searching with options/filters
-- [ ] Add link pagination
+- [x] Add link pagination
 
 ### Indexer
 
 - [x] Indexing of links from a certain domain
 - [x] Increment the timestamp automatically when a request is done
 - [ ] Re-try indexing of failed requests (Usually 504 errors)
-- [ ] Stop indexing at a certain date
-- [ ] Allow controlling of basic features (If indexer is running, domain to index, start timestamp?) with startup arguments
+- [x] Stop indexing at a certain date
+- [x] Allow controlling of basic features (If indexer is running, domain to index, start timestamp?) with startup arguments
 - [ ] Allow indexing of multiple domains at once. Not sure of the request limit to archive.org's API
 - [ ] Stop duplicate links, links can be in it multiple times (links that change like domain.com/latestDownload) but not if everything is the same (timestamp, link, mimeType, status code etc) as it would be the exact same link.
