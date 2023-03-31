@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface FailedRequestRepository extends JpaRepository<FailedRequest, Long> {
 
     boolean existsByTimestampAndDomain(String timestamp, Domain domain);
+
+    int countAllByDomain(Domain domain);
 }

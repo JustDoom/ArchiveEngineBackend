@@ -1,7 +1,9 @@
 package com.imjustdoom.service;
 
 import com.imjustdoom.Timestamp;
+import com.imjustdoom.dto.out.DomainStatisticsResponse;
 import com.imjustdoom.dto.out.SimpleUrlResponse;
+import com.imjustdoom.dto.out.StatisticsResponse;
 import com.imjustdoom.model.Domain;
 import com.imjustdoom.model.FailedRequest;
 import com.imjustdoom.model.Url;
@@ -80,5 +82,16 @@ public class UrlService {
 
     public List<FailedRequest> getFailedUrls() {
         return this.failedRequestRepository.findAll();
+    }
+
+    public ResponseEntity<?> getStatistics() {
+        return ResponseEntity.ok().body(new StatisticsResponse(this.domainRepository.findAll()
+                .stream().map(domain -> new DomainStatisticsResponse(
+                        domain.getDomain(),
+                        this.urlRepository.countAllByDomain(domain),
+                        this.failedRequestRepository.countAllByDomain(domain),
+                        domain.getTimestamp(),
+                        this.urlRepository.findFirstByDomainOrderByTimestampAsc(domain).map(Url::getTimestamp).orElse("N/A")))
+                .collect(Collectors.toList())));
     }
 }
