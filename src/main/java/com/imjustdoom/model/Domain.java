@@ -28,10 +28,10 @@ public class Domain {
     @Column
     private Timestamp.Time time;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "domain")
+    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, mappedBy = "domain")
     private List<Url> urls = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "domain")
+    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, mappedBy = "domain")
     private List<FailedRequest> failedRequests = new ArrayList<>();
 
     public Domain(String domain) {

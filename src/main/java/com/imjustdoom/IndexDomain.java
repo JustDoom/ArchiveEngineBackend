@@ -116,12 +116,7 @@ public class IndexDomain {
                 urlList.add(u);
             }
 
-            response = null;
-            element = null;
-
             this.urlService.addAllUrl(urlList);
-
-            urlList.clear();
         } catch (Exception exception) {
             exception.printStackTrace();
             this.urlService.addFailedRequest(this.timestamp.toString(), this.timestamp.getTimeType(), this.domainModel);
