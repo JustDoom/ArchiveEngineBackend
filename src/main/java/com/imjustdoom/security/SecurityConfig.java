@@ -40,7 +40,8 @@ public class SecurityConfig {
         corsConfiguration.setAllowedOrigins(Collections.singletonList("*")); // TODO: make this get the current domain
         corsConfiguration.setAllowedMethods(List.of("GET", "POST"));
 
-        source.registerCorsConfiguration("/api/search/**", corsConfiguration);
+        source.registerCorsConfiguration("/api/search**", corsConfiguration);
+        source.registerCorsConfiguration("/api/statistics", corsConfiguration);
 
         return source;
     }
