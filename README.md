@@ -28,8 +28,11 @@ General feature TODO, doesn't include code cleanups, small fixes and stuff.
 - [x] Basic way to search for links
 - [x] Return the link along with the timestamp, mimetype and status code
 - [x] A way to sort by the stored information (timestamp, mimetype, status code and url)
-- [ ] Allow searching with options/filters
+- [ ] Allow searching with options/filters. Includes excluding results with certain words
 - [x] Add link pagination
+- [ ] Use a proper search algorithm/engine (elasticsearch/meilisearch)
+- [ ] Proper error handling and returning responses
+- [ ] Allow changing of the page size
 
 ### Indexer
 
