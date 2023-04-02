@@ -1,6 +1,7 @@
 package com.imjustdoom.service;
 
 import com.imjustdoom.dto.out.DomainStatisticsResponse;
+import com.imjustdoom.dto.out.MessageResponse;
 import com.imjustdoom.dto.out.SimpleUrlResponse;
 import com.imjustdoom.dto.out.StatisticsResponse;
 import com.imjustdoom.model.Url;
@@ -27,10 +28,10 @@ public class UrlService {
     private final DomainRepository domainRepository;
 
     public ResponseEntity<?> searchChecks(String query, String page, String sortBy, String ascending) {
-        if (query == null || query.isEmpty()) return ResponseEntity.badRequest().body("Query cannot be empty");
-        if (!page.matches("[0-9]+")) return ResponseEntity.badRequest().body("Page must be a number");
-        if (!sortBy.matches("(?i)timestamp|url|mimetype|statuscode")) return ResponseEntity.badRequest().body("sortBy must be either timestamp, mimeType, statusCode or url");
-        if (!ascending.matches("true|false")) return ResponseEntity.badRequest().body("ascending must be either true or false");
+        if (query == null || query.isEmpty()) return ResponseEntity.badRequest().body(new MessageResponse("Query cannot be empty"));
+        if (!page.matches("[0-9]+")) return ResponseEntity.badRequest().body(new MessageResponse("Page must be a number"));
+        if (!sortBy.matches("(?i)timestamp|url|mimetype|statuscode")) return ResponseEntity.badRequest().body(new MessageResponse("sortBy must be either timestamp, mimeType, statusCode or url"));
+        if (!ascending.matches("true|false")) return ResponseEntity.badRequest().body(new MessageResponse("ascending must be either true or false"));
 
         return ResponseEntity.ok().body(search(query, page, sortBy, ascending));
     }
