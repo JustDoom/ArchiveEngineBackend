@@ -1,4 +1,4 @@
-package com.imjustdoom;
+package com.imjustdoom.indexer;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

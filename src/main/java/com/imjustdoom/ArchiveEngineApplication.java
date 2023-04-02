@@ -1,6 +1,5 @@
 package com.imjustdoom;
 
-import com.imjustdoom.service.UrlService;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

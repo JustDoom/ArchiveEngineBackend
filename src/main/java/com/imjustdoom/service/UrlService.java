@@ -1,11 +1,8 @@
 package com.imjustdoom.service;
 
-import com.imjustdoom.Timestamp;
 import com.imjustdoom.dto.out.DomainStatisticsResponse;
 import com.imjustdoom.dto.out.SimpleUrlResponse;
 import com.imjustdoom.dto.out.StatisticsResponse;
-import com.imjustdoom.model.Domain;
-import com.imjustdoom.model.FailedRequest;
 import com.imjustdoom.model.Url;
 import com.imjustdoom.repository.DomainRepository;
 import com.imjustdoom.repository.FailedRequestRepository;
@@ -18,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Validated
@@ -44,44 +40,8 @@ public class UrlService {
                 .stream().map(url -> new SimpleUrlResponse(url.getUrl(), url.getTimestamp(), url.getMimeType(), url.getStatusCode())).toList();
     }
 
-    public void addUrl(String url, String mimeType, String timestamp, String endTimestamp, String statusCode, Domain domain) {
-        if (this.urlRepository.existsByUrlAndMimeTypeAndTimestampAndEndTimestampAndStatusCode(url, mimeType, timestamp, endTimestamp, statusCode)) return;
-        Url url1 = new Url(url, mimeType, timestamp, endTimestamp, statusCode, domain);
-        this.urlRepository.save(url1);
-    }
-
-    public boolean checkIfUrlExists(Url url) {
-        return this.urlRepository.existsByUrlAndMimeTypeAndTimestampAndEndTimestampAndStatusCode(url.getUrl(), url.getMimeType(), url.getTimestamp(), url.getEndTimestamp(), url.getStatusCode());
-    }
-
     public void addAllUrl(List<Url> urls) {
         this.urlRepository.saveAll(urls);
-    }
-
-    public void addFailedRequest(String timestamp, Timestamp.Time time, Domain domain) {
-        if (this.failedRequestRepository.existsByTimestampAndDomain(timestamp, domain)) return;
-        FailedRequest failedRequest = new FailedRequest(timestamp, time, domain);
-        this.failedRequestRepository.save(failedRequest);
-    }
-
-    public boolean domainExists(String domain) {
-        return this.domainRepository.existsByDomain(domain);
-    }
-
-    public void addDomain(String domain) {
-        this.domainRepository.save(new Domain(domain));
-    }
-
-    public Optional<Domain> getDomain(String domain) {
-        return this.domainRepository.findByDomain(domain);
-    }
-
-    public void saveDomain(Domain domain) {
-        this.domainRepository.save(domain);
-    }
-
-    public List<FailedRequest> getFailedUrls() {
-        return this.failedRequestRepository.findAll();
     }
 
     public ResponseEntity<?> getStatistics() {

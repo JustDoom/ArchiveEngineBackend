@@ -1,18 +1,22 @@
-package com.imjustdoom;
+package com.imjustdoom.indexer;
 
 import com.imjustdoom.model.Domain;
+import com.imjustdoom.service.DomainService;
+import com.imjustdoom.service.FailedRequestService;
 import com.imjustdoom.service.UrlService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
-public class Runner implements CommandLineRunner {
+@AllArgsConstructor
+public class IndexRunner implements CommandLineRunner {
 
-    @Autowired
-    private UrlService urlService;
+    private final UrlService urlService;
+    private final DomainService domainService;
+    private final FailedRequestService failedRequestService;
 
     @Override
     public void run(String... args) {
@@ -40,10 +44,8 @@ public class Runner implements CommandLineRunner {
             return;
         }
 
-        // This is where th indexer starts
-
         // Check if domain exists and if it does load its data
-        Optional<Domain> optionalDomain = this.urlService.getDomain(domain);
+        Optional<Domain> optionalDomain = this.domainService.getDomain(domain);
         Timestamp ts;
         if (timestampOverride) {
             ts = new Timestamp(timestamp, Timestamp.Time.MONTH);
@@ -54,6 +56,6 @@ public class Runner implements CommandLineRunner {
         }
 
         // Create the indexer
-        new IndexDomain(domain, ts, stopIndexingTimestamp, 10000, this.urlService).startScanning();
+        new IndexDomain(domain, ts, stopIndexingTimestamp, 10000, this.urlService, this.domainService, this.failedRequestService).startScanning();
     }
 }

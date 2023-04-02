@@ -1,6 +1,6 @@
 package com.imjustdoom.model;
 
-import com.imjustdoom.Timestamp;
+import com.imjustdoom.indexer.Timestamp;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

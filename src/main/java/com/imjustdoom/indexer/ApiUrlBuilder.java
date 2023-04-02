@@ -1,4 +1,4 @@
-package com.imjustdoom;
+package com.imjustdoom.indexer;
 
 public class ApiUrlBuilder {
 

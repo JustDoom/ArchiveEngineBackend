@@ -1,9 +1,11 @@
-package com.imjustdoom;
+package com.imjustdoom.indexer;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.imjustdoom.model.Domain;
 import com.imjustdoom.model.Url;
+import com.imjustdoom.service.DomainService;
+import com.imjustdoom.service.FailedRequestService;
 import com.imjustdoom.service.UrlService;
 
 import java.io.BufferedReader;
@@ -17,8 +19,6 @@ import java.util.Optional;
 
 public class IndexDomain {
 
-    private final String apiUrl = "https://web.archive.org/web/timemap/json?url=dl.dropboxusercontent.com";
-
     private final String domain;
     private final Timestamp timestamp;
     private final String stopIndexingTimestamp;
@@ -26,19 +26,23 @@ public class IndexDomain {
     private final Domain domainModel;
 
     private final UrlService urlService;
+    private final DomainService domainService;
+    private final FailedRequestService failedRequestService;
 
-    public IndexDomain(String domain, Timestamp timestamp, String stopIndexingTimestamp, int limit, UrlService urlService) {
+    public IndexDomain(String domain, Timestamp timestamp, String stopIndexingTimestamp, int limit, UrlService urlService, DomainService domainService, FailedRequestService failedRequestService) {
         this.domain = domain;
         this.timestamp = timestamp;
         this.stopIndexingTimestamp = stopIndexingTimestamp;
         this.limit = limit;
         this.urlService = urlService;
+        this.domainService = domainService;
+        this.failedRequestService = failedRequestService;
 
         // Create the domain in the database if it doesn't exist
-        Optional<Domain> domainOptional = this.urlService.getDomain(domain);
+        Optional<Domain> domainOptional = this.domainService.getDomain(domain);
         if (domainOptional.isEmpty()) {
-            this.urlService.addDomain(domain);
-            this.domainModel = this.urlService.getDomain(domain).get();
+            this.domainService.addDomain(domain);
+            this.domainModel = this.domainService.getDomain(domain).get();
         } else {
             this.domainModel = domainOptional.get();
         }
@@ -90,7 +94,7 @@ public class IndexDomain {
 
             this.domainModel.setTime(this.timestamp.getTimeType());
             this.domainModel.setTimestamp(this.timestamp.toString());
-            this.urlService.saveDomain(this.domainModel);
+            this.domainService.saveDomain(this.domainModel);
         }
     }
 
@@ -111,15 +115,13 @@ public class IndexDomain {
             // TODO: run on another thread so it can make a request while this is running
             for (int i = 1; i < element.getAsJsonArray().size(); i++) {
                 JsonElement urlInfo = element.getAsJsonArray().get(i);
-                Url u = new Url(urlInfo.getAsJsonArray().get(0).getAsString(), urlInfo.getAsJsonArray().get(1).getAsString(), urlInfo.getAsJsonArray().get(2).getAsString(), urlInfo.getAsJsonArray().get(3).getAsString(), urlInfo.getAsJsonArray().get(5).getAsString(), this.domainModel);
-                //if (this.urlService.checkIfUrlExists(u)) continue;
-                urlList.add(u);
+                urlList.add(new Url(urlInfo.getAsJsonArray().get(0).getAsString(), urlInfo.getAsJsonArray().get(1).getAsString(), urlInfo.getAsJsonArray().get(2).getAsString(), urlInfo.getAsJsonArray().get(3).getAsString(), urlInfo.getAsJsonArray().get(5).getAsString(), this.domainModel));
             }
 
             this.urlService.addAllUrl(urlList);
         } catch (Exception exception) {
             exception.printStackTrace();
-            this.urlService.addFailedRequest(this.timestamp.toString(), this.timestamp.getTimeType(), this.domainModel);
+            this.failedRequestService.addFailedRequest(this.timestamp.toString(), this.timestamp.getTimeType(), this.domainModel);
         }
 
         return false;
