@@ -23,4 +23,6 @@ public interface UrlRepository extends JpaRepository<Url, Long> {
     int countAllByDomain(Domain domain);
 
     Optional<Url> findFirstByDomainOrderByTimestampAsc(Domain domain);
+
+    Optional<Url> findFirstByDomainOrderByTimestampDesc(Domain domain);
 }

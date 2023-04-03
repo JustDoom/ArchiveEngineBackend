@@ -51,7 +51,7 @@ public class UrlService {
                         domain.getDomain(),
                         this.urlRepository.countAllByDomain(domain),
                         this.failedRequestRepository.countAllByDomain(domain),
-                        domain.getTimestamp(),
+                        this.urlRepository.findFirstByDomainOrderByTimestampDesc(domain).map(Url::getTimestamp).orElse("N/A"),
                         this.urlRepository.findFirstByDomainOrderByTimestampAsc(domain).map(Url::getTimestamp).orElse("N/A")))
                 .collect(Collectors.toList())));
     }
