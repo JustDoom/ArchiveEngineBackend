@@ -23,7 +23,7 @@ public class IndexRunner implements CommandLineRunner {
 
         String domain = "";
         String timestamp = "20000101000000";
-        String stopIndexingTimestamp = "99990101000000";
+        String stopIndexingTimestamp = "20230101000000";
         boolean timestampOverride = false;
 
         for (int i = 0; i < args.length; i++) {
