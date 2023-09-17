@@ -33,7 +33,10 @@ public class UrlService {
         if (!sortBy.matches("(?i)timestamp|url|mimetype|statuscode")) return ResponseEntity.badRequest().body(new MessageResponse("sortBy must be either timestamp, mimeType, statusCode or url"));
         if (!ascending.matches("true|false")) return ResponseEntity.badRequest().body(new MessageResponse("ascending must be either true or false"));
 
-        return ResponseEntity.ok().body(search(query, page, sortBy, ascending));
+        long start = System.currentTimeMillis();
+        List<SimpleUrlResponse> responses = search(query, page, sortBy, ascending);
+        System.out.println(System.currentTimeMillis() - start);
+        return ResponseEntity.ok().body(responses);
     }
 
     public List<SimpleUrlResponse> search(String query, String page, String sortBy, String ascending) {

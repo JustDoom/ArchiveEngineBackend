@@ -26,7 +26,7 @@ public class SecurityConfig {
         http.cors().and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/search/**", "/api/statistics").permitAll()
+                .requestMatchers("/api/search/**", "/api/statistics", "/api/test").permitAll()
                 .anyRequest().authenticated().and()
                 .httpBasic();
         return http.build();

@@ -16,7 +16,8 @@ public class Url {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(nullable = false, columnDefinition="TEXT")
+    @Column(nullable = false, columnDefinition="FULLTEXT")
+    @org.hibernate.annotations.Index(name = "idx_url")
     private String url;
 
     @Column(nullable = false)
