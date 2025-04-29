@@ -2,8 +2,8 @@ package com.imjustdoom.indexer;
 
 public class ApiUrlBuilder {
 
-    private final String apiUrl = "https://web.archive.org/cdx/search/cdx?url=";
-    private final String staticOptions = "&matchType=prefix&collapse=urlkey&output=json&fl=original,mimetype,timestamp,endtimestamp,statusCode,groupcount,uniqcount,digest";
+    private static final String API_URL = "https://web.archive.org/cdx/search/cdx?url=";
+    private static final String STATIC_OPTIONS = "&matchType=prefix&collapse=urlkey&output=json&fl=original,mimetype,timestamp,endtimestamp,statusCode,groupcount,uniqcount,digest";
 
     // Both prefix and domain options could be useful https://github.com/internetarchive/wayback/tree/master/wayback-cdx-server#url-match-scope
     private String domain = "";
@@ -12,7 +12,7 @@ public class ApiUrlBuilder {
     private String from = "";
 
     public String build() {
-        return apiUrl + domain + limit + to + from + staticOptions;
+        return API_URL + domain + limit + to + from + STATIC_OPTIONS;
     }
 
     public ApiUrlBuilder setDomain(String domain) {
