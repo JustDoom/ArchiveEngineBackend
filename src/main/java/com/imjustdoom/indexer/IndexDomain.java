@@ -118,7 +118,13 @@ public class IndexDomain {
             // TODO: run on another thread so it can make a request while this is running
             for (int i = 1; i < element.getAsJsonArray().size(); i++) {
                 JsonElement urlInfo = element.getAsJsonArray().get(i);
-                urlList.add(new Url(urlInfo.getAsJsonArray().get(0).getAsString(), urlInfo.getAsJsonArray().get(1).getAsString(), urlInfo.getAsJsonArray().get(2).getAsString(), urlInfo.getAsJsonArray().get(3).getAsString(), urlInfo.getAsJsonArray().get(5).getAsString(), this.domainModel));
+                urlList.add(new Url(
+                        urlInfo.getAsJsonArray().get(0).getAsString(),
+                        urlInfo.getAsJsonArray().get(1).getAsString(),
+                        urlInfo.getAsJsonArray().get(2).getAsString(),
+                        urlInfo.getAsJsonArray().get(3).getAsString(),
+                        urlInfo.getAsJsonArray().get(4).getAsString(),
+                        urlInfo.getAsJsonArray().get(7).getAsString(), this.domainModel));
             }
 
             this.urlService.addAllUrl(urlList);
@@ -137,9 +143,9 @@ public class IndexDomain {
             URL url = new URL(urlString);
             HttpURLConnection huc = (HttpURLConnection) url.openConnection();
             HttpURLConnection.setFollowRedirects(false);
-            huc.setConnectTimeout(60 * 1000);
+            huc.setConnectTimeout(30 * 1000); // 30 seconds
             huc.setRequestMethod("GET");
-            huc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 (.NET CLR 3.5.30729)");
+            huc.setRequestProperty("User-Agent", "Wayback Engine - In Development (justdoomdev@gmail.com)");
             huc.connect();
             InputStream input = huc.getInputStream();
             reader = new BufferedReader(new InputStreamReader(input));
