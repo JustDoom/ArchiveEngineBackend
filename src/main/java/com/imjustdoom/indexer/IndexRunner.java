@@ -54,15 +54,15 @@ public class IndexRunner implements CommandLineRunner {
         Optional<Domain> optionalDomain = this.domainService.getDomain(domain);
         Timestamp ts;
         if (timestampOverride) {
-            ts = new Timestamp(timestamp, Timestamp.Time.YEAR);
+            ts = new Timestamp(timestamp, Timestamp.Time.MONTH);
         } else if (optionalDomain.isPresent() && optionalDomain.get().getTimestamp() != null && optionalDomain.get().getTime() != null) {
             ts = new Timestamp(optionalDomain.get().getTimestamp(), optionalDomain.get().getTime());
         } else {
-            ts = new Timestamp(timestamp, Timestamp.Time.YEAR);
+            ts = new Timestamp(timestamp, Timestamp.Time.MONTH);
         }
 
         // Create the indexer
-        new IndexDomain(domain, ts, stopIndexingTimestamp, 7500, this.urlService, this.domainService, this.failedRequestService, this.meilisearchService).startScanning();
+        new IndexDomain(domain, ts, stopIndexingTimestamp, 10000, this.urlService, this.domainService, this.failedRequestService, this.meilisearchService).startScanning();
         System.out.println("Indexer finished");
     }
 }

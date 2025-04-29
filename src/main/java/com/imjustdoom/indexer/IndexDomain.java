@@ -81,7 +81,7 @@ public class IndexDomain {
         // super messy, gotta fix it
         // TODO: Make it stop after a certain date, for now it's fine for testing
         while (!this.timestamp.toString().equals(stopIndexingTimestamp)) {
-            if (getLinks(this.domain, this.timestamp.toString().substring(0, this.timestamp.getTimeType().getSub()))) { // If it is larger than the limit
+            if (getLinks(this.domain, this.timestamp.toString().substring(0, this.timestamp.getTimeType().getSub()), false)) { // If it is larger than the limit
                 // Store what the too large one was
                 one = this.timestamp.getTimeType();
                 num = this.timestamp.get(one);
@@ -102,7 +102,7 @@ public class IndexDomain {
         }
     }
 
-    private boolean getLinks(String domain, String timestamp) {
+    private boolean getLinks(String domain, String timestamp, boolean firstAttempt) {
         try {
             String url = new ApiUrlBuilder().setLimit(this.limit).setDomain(domain).setFrom(timestamp).setTo(timestamp).build();
             System.out.println(url);
@@ -131,8 +131,14 @@ public class IndexDomain {
             this.urlService.addAllUrl(urlList);
             this.meilisearchService.indexProducts(urlList);
         } catch (Exception exception) {
-            exception.printStackTrace();
-            this.failedRequestService.addFailedRequest(this.timestamp.toString(), this.timestamp.getTimeType(), this.domainModel);
+            if (firstAttempt) {
+                System.out.println("Attempt 2");
+                this.timestamp.setTimeType(this.timestamp.goDownOneTime(this.timestamp.getTimeType()));
+                getLinks(domain, timestamp, false);
+            } else {
+                exception.printStackTrace();
+                this.failedRequestService.addFailedRequest(this.timestamp.toString(), this.timestamp.getTimeType(), this.domainModel);
+            }
         }
 
         return false;
