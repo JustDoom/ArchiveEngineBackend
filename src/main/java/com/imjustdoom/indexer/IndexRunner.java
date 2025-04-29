@@ -62,7 +62,7 @@ public class IndexRunner implements CommandLineRunner {
         }
 
         // Create the indexer
-        new IndexDomain(domain, ts, stopIndexingTimestamp, 15000, this.urlService, this.domainService, this.failedRequestService, this.meilisearchService).startScanning();
+        new IndexDomain(domain, ts, stopIndexingTimestamp, 7500, this.urlService, this.domainService, this.failedRequestService, this.meilisearchService).startScanning();
         System.out.println("Indexer finished");
     }
 }

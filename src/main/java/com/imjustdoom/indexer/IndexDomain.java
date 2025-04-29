@@ -10,6 +10,7 @@ import com.imjustdoom.service.MeilisearchService;
 import com.imjustdoom.service.UrlService;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -137,29 +138,26 @@ public class IndexDomain {
         return false;
     }
 
-    private String readUrl(String urlString) throws Exception {
-        BufferedReader reader = null;
-        try {
-            URL url = new URL(urlString);
-            HttpURLConnection huc = (HttpURLConnection) url.openConnection();
-            HttpURLConnection.setFollowRedirects(false);
-            huc.setConnectTimeout(30 * 1000); // 30 seconds
-            huc.setRequestMethod("GET");
-            huc.setRequestProperty("User-Agent", "Wayback Engine - In Development (justdoomdev@gmail.com)");
-            huc.connect();
-            InputStream input = huc.getInputStream();
-            reader = new BufferedReader(new InputStreamReader(input));
+    private String readUrl(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+        HttpURLConnection.setFollowRedirects(false);
+        huc.setConnectTimeout(30 * 1000); // 30 seconds
+        huc.setRequestMethod("GET");
+        huc.setRequestProperty("User-Agent",  "Wayback Engine - In Development (justdoomdev@gmail.com)");
+
+        int responseCode = huc.getResponseCode();
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            throw new IOException("Failed to fetch data: HTTP response code " + responseCode);
+        }
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(huc.getInputStream()))) {
             StringBuilder buffer = new StringBuilder();
-            int read;
-            char[] chars = new char[1024];
-            while ((read = reader.read(chars)) != -1) {
-                buffer.append(chars, 0, read);
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line).append(System.lineSeparator());
             }
-            return buffer.toString();
-        } finally {
-            if (reader != null) {
-                reader.close();
-            }
+            return buffer.toString().trim(); // Trim to remove the last newline
         }
     }
 }
