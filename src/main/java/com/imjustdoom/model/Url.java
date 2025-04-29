@@ -1,15 +1,9 @@
 package com.imjustdoom.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"url", "mimeType", "timestamp", "endTimestamp", "statusCode", "domain_id"}))
-@NoArgsConstructor
 public class Url {
 
     @Id
@@ -35,6 +29,8 @@ public class Url {
     @ManyToOne(fetch = FetchType.LAZY)
     private Domain domain;
 
+    public Url() {}
+
     public Url(String url, String mimeType, String timestamp, String endTimestamp, String statusCode, Domain domain) {
         this.url = url;
         this.mimeType = mimeType;
@@ -42,5 +38,29 @@ public class Url {
         this.endTimestamp = endTimestamp;
         this.statusCode = statusCode;
         this.domain = domain;
+    }
+
+    public String getUrl() {
+        return this.url;
+    }
+
+    public String getMimeType() {
+        return this.mimeType;
+    }
+
+    public String getTimestamp() {
+        return this.timestamp;
+    }
+
+    public String getEndTimestamp() {
+        return this.endTimestamp;
+    }
+
+    public String getStatusCode() {
+        return this.statusCode;
+    }
+
+    public Domain getDomain() {
+        return this.domain;
     }
 }

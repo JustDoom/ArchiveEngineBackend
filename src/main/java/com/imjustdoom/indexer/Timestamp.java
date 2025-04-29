@@ -1,13 +1,8 @@
 package com.imjustdoom.indexer;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 
-@Getter
 public class Timestamp {
-
     private int year;
     private int month;
     private int day;
@@ -151,6 +146,10 @@ public class Timestamp {
             case MINUTE -> this.minute;
             case SECOND -> this.second;
         };
+    }
+
+    public Time getTimeType() {
+        return this.timeType;
     }
 
     public void setTimeType(Time timeType) {

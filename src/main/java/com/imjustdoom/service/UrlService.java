@@ -8,7 +8,6 @@ import com.imjustdoom.model.Url;
 import com.imjustdoom.repository.DomainRepository;
 import com.imjustdoom.repository.FailedRequestRepository;
 import com.imjustdoom.repository.UrlRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +19,16 @@ import java.util.stream.Collectors;
 
 @Validated
 @Service
-@RequiredArgsConstructor
 public class UrlService {
-
     private final UrlRepository urlRepository;
     private final FailedRequestRepository failedRequestRepository;
     private final DomainRepository domainRepository;
+
+    public UrlService(UrlRepository urlRepository, FailedRequestRepository failedRequestRepository, DomainRepository domainRepository) {
+        this.urlRepository = urlRepository;
+        this.failedRequestRepository = failedRequestRepository;
+        this.domainRepository = domainRepository;
+    }
 
     public ResponseEntity<?> searchChecks(String query, String page, String sortBy, String ascending) {
         if (query == null || query.isEmpty()) return ResponseEntity.badRequest().body(new MessageResponse("Query cannot be empty"));

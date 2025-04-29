@@ -3,7 +3,7 @@ package com.imjustdoom.indexer;
 public class ApiUrlBuilder {
 
     private final String apiUrl = "https://web.archive.org/web/timemap/json?url=";
-    private final String staticOptions = "&matchType=prefix&collapse=urlkey&output=json&fl=original%2Cmimetype%2Ctimestamp%2Cendtimestamp%2Cgroupcount%2Cstatuscode";
+    private final String staticOptions = "&matchType=prefix&collapse=urlkey&output=json&fl=original%2Cmimetype%2Ctimestamp%2Cendtimestamp%2Cgroupcount%2Cuniqcount";
 
     private String domain = "";
     private String limit = "";

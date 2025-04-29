@@ -2,19 +2,12 @@ package com.imjustdoom.model;
 
 import com.imjustdoom.indexer.Timestamp;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Setter
 @Entity
-@NoArgsConstructor
 public class Domain {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -34,7 +27,30 @@ public class Domain {
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, mappedBy = "domain")
     private List<FailedRequest> failedRequests = new ArrayList<>();
 
+    public Domain() {}
+
     public Domain(String domain) {
         this.domain = domain;
+    }
+
+    public String getDomain() {
+        return this.domain;
+    }
+
+    public Timestamp.Time getTime() {
+        return time;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+
+    public void setTime(Timestamp.Time time) {
+        this.time = time;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 }

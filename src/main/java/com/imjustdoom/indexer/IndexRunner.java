@@ -4,19 +4,22 @@ import com.imjustdoom.model.Domain;
 import com.imjustdoom.service.DomainService;
 import com.imjustdoom.service.FailedRequestService;
 import com.imjustdoom.service.UrlService;
-import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
-@AllArgsConstructor
 public class IndexRunner implements CommandLineRunner {
-
     private final UrlService urlService;
     private final DomainService domainService;
     private final FailedRequestService failedRequestService;
+
+    public IndexRunner(UrlService urlService, DomainService domainService, FailedRequestService failedRequestService) {
+        this.urlService = urlService;
+        this.domainService = domainService;
+        this.failedRequestService = failedRequestService;
+    }
 
     @Override
     public void run(String... args) {

@@ -1,17 +1,5 @@
 package com.imjustdoom.dto.out;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+public record DomainStatisticsResponse(String domain, long totalUrls, long totalFailedRequests, String indexedTo, String indexedFrom) {
 
-@Getter
-@Setter
-@AllArgsConstructor
-public class DomainStatisticsResponse {
-
-    private String domain;
-    private long totalUrls;
-    private long totalFailedRequests;
-    private String indexedTo;
-    private String indexedFrom;
 }

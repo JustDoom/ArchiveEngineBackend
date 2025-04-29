@@ -2,15 +2,10 @@ package com.imjustdoom.model;
 
 import com.imjustdoom.indexer.Timestamp;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
 @Entity
-@NoArgsConstructor
 public class FailedRequest {
+    public FailedRequest() {}
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class IndexDomain {
-
     private final String domain;
     private final Timestamp timestamp;
     private final String stopIndexingTimestamp;

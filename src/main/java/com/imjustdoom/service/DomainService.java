@@ -2,7 +2,6 @@ package com.imjustdoom.service;
 
 import com.imjustdoom.model.Domain;
 import com.imjustdoom.repository.DomainRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -10,10 +9,12 @@ import java.util.Optional;
 
 @Validated
 @Service
-@RequiredArgsConstructor
 public class DomainService {
-
     private final DomainRepository domainRepository;
+
+    public DomainService(DomainRepository domainRepository) {
+        this.domainRepository = domainRepository;
+    }
 
     public void addDomain(String domain) {
         this.domainRepository.save(new Domain(domain));
