@@ -1,5 +1,6 @@
 package com.imjustdoom.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -28,6 +29,7 @@ public class Url {
     @Column(nullable = false)
     private String digest;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private Domain domain;
 
