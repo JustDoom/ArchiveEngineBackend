@@ -6,6 +6,7 @@ import com.imjustdoom.model.Domain;
 import com.imjustdoom.model.Url;
 import com.imjustdoom.service.DomainService;
 import com.imjustdoom.service.FailedRequestService;
+import com.imjustdoom.service.MeilisearchService;
 import com.imjustdoom.service.UrlService;
 
 import java.io.BufferedReader;
@@ -27,8 +28,9 @@ public class IndexDomain {
     private final UrlService urlService;
     private final DomainService domainService;
     private final FailedRequestService failedRequestService;
+    private final MeilisearchService meilisearchService;
 
-    public IndexDomain(String domain, Timestamp timestamp, String stopIndexingTimestamp, int limit, UrlService urlService, DomainService domainService, FailedRequestService failedRequestService) {
+    public IndexDomain(String domain, Timestamp timestamp, String stopIndexingTimestamp, int limit, UrlService urlService, DomainService domainService, FailedRequestService failedRequestService, MeilisearchService meilisearchService) {
         this.domain = domain;
         this.timestamp = timestamp;
         this.stopIndexingTimestamp = stopIndexingTimestamp;
@@ -36,6 +38,7 @@ public class IndexDomain {
         this.urlService = urlService;
         this.domainService = domainService;
         this.failedRequestService = failedRequestService;
+        this.meilisearchService = meilisearchService;
 
         // Create the domain in the database if it doesn't exist
         Optional<Domain> domainOptional = this.domainService.getDomain(domain);
@@ -86,8 +89,9 @@ public class IndexDomain {
                 this.timestamp.setTimeType(this.timestamp.goDownOneTime(this.timestamp.getTimeType()));
             } else { // If it is smaller than the limit
                 // Go up one time if
-                if (one == this.timestamp.getTimeType() && num == this.timestamp.get(this.timestamp.getTimeType()))
+                if (one == this.timestamp.getTimeType() && num == this.timestamp.get(this.timestamp.getTimeType())) {
                     this.timestamp.setTimeType(this.timestamp.goUpOneTime(this.timestamp.getTimeType()));
+                }
                 this.timestamp.plus(this.timestamp.getTimeType(), 1);
             }
 
@@ -118,6 +122,7 @@ public class IndexDomain {
             }
 
             this.urlService.addAllUrl(urlList);
+            this.meilisearchService.indexProducts(urlList);
         } catch (Exception exception) {
             exception.printStackTrace();
             this.failedRequestService.addFailedRequest(this.timestamp.toString(), this.timestamp.getTimeType(), this.domainModel);

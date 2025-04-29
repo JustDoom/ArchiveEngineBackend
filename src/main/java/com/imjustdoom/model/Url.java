@@ -10,7 +10,7 @@ public class Url {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(nullable = false, columnDefinition="FULLTEXT")
+    @Column(nullable = false, columnDefinition="TEXT")
     @org.hibernate.annotations.Index(name = "idx_url")
     private String url;
 
@@ -38,6 +38,10 @@ public class Url {
         this.endTimestamp = endTimestamp;
         this.statusCode = statusCode;
         this.domain = domain;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getUrl() {

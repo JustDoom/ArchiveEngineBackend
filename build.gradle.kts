@@ -19,6 +19,8 @@ dependencies {
     api(libs.org.springframework.boot.spring.boot.configuration.processor)
     api(libs.javax.validation.validation.api)
     api(libs.org.springframework.boot.spring.boot.starter.validation)
+    api("com.meilisearch.sdk:meilisearch-java:0.14.4")
+    api("com.squareup.okhttp3:okhttp:4.12.0")
     runtimeOnly(libs.org.mariadb.jdbc.mariadb.java.client)
     testImplementation(libs.org.springframework.boot.spring.boot.starter.test)
     testImplementation(libs.org.springframework.security.spring.security.test)

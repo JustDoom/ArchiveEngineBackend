@@ -3,6 +3,7 @@ package com.imjustdoom.indexer;
 import com.imjustdoom.model.Domain;
 import com.imjustdoom.service.DomainService;
 import com.imjustdoom.service.FailedRequestService;
+import com.imjustdoom.service.MeilisearchService;
 import com.imjustdoom.service.UrlService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -14,11 +15,13 @@ public class IndexRunner implements CommandLineRunner {
     private final UrlService urlService;
     private final DomainService domainService;
     private final FailedRequestService failedRequestService;
+    private final MeilisearchService meilisearchService;
 
-    public IndexRunner(UrlService urlService, DomainService domainService, FailedRequestService failedRequestService) {
+    public IndexRunner(UrlService urlService, DomainService domainService, FailedRequestService failedRequestService, MeilisearchService meilisearchService) {
         this.urlService = urlService;
         this.domainService = domainService;
         this.failedRequestService = failedRequestService;
+        this.meilisearchService = meilisearchService;
     }
 
     @Override
@@ -59,6 +62,7 @@ public class IndexRunner implements CommandLineRunner {
         }
 
         // Create the indexer
-        new IndexDomain(domain, ts, stopIndexingTimestamp, 10000, this.urlService, this.domainService, this.failedRequestService).startScanning();
+        new IndexDomain(domain, ts, stopIndexingTimestamp, 10000, this.urlService, this.domainService, this.failedRequestService, this.meilisearchService).startScanning();
+        System.out.println("Indexer finished");
     }
 }
