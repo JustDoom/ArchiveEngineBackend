@@ -28,7 +28,7 @@ public class IndexRunner implements CommandLineRunner {
     public void run(String... args) {
 
         String domain = "";
-        String timestamp = "20000101000000";
+        String timestamp = "20150101000000";
         String stopIndexingTimestamp = "20230101000000";
         boolean timestampOverride = false;
 
@@ -62,7 +62,7 @@ public class IndexRunner implements CommandLineRunner {
         }
 
         // Create the indexer
-        new IndexDomain(domain, ts, stopIndexingTimestamp, 10000, this.urlService, this.domainService, this.failedRequestService, this.meilisearchService).startScanning();
+        new IndexDomain(domain, ts, stopIndexingTimestamp, 150000, this.urlService, this.domainService, this.failedRequestService, this.meilisearchService).startScanning();
         System.out.println("Indexer finished");
     }
 }

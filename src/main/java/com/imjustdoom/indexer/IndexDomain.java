@@ -11,7 +11,6 @@ import com.imjustdoom.service.UrlService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -78,28 +77,67 @@ public class IndexDomain {
         one = null;
         num = -1;
 
+        try {
+            int pages = Integer.parseInt(readUrl(String.format("https://web.archive.org/cdx/search/cdx?url=%s&matchType=prefix&showNumPages=true", "cdn.discordapp.com")));
+            System.out.println("Pages " + pages);
+            for (int i = 0; i < pages; i++) {
+                String url = String.format("https://web.archive.org/cdx/search/cdx?url=%s&matchType=prefix&collapse=urlkey&output=json&fl=original,mimetype,timestamp,endtimestamp,statuscode,groupcount,uniqcount,digest&page=%s", "cdn.discordapp.com", i);
+                System.out.println(url);
+                try {
+                    String response = readUrl(url);
+//                System.out.println(response);
+
+                    JsonElement element = JsonParser.parseString(response);
+
+                    System.out.println(element.getAsJsonArray().size());
+
+                    List<Url> urlList = new ArrayList<>();
+                    // TODO: run on another thread so it can make a request while this is running
+                    for (int j = 1; j < element.getAsJsonArray().size(); j++) {
+                        JsonElement urlInfo = element.getAsJsonArray().get(j);
+                        urlList.add(new Url(
+                                urlInfo.getAsJsonArray().get(0).getAsString(),
+                                urlInfo.getAsJsonArray().get(1).getAsString(),
+                                urlInfo.getAsJsonArray().get(2).getAsString(),
+                                urlInfo.getAsJsonArray().get(3).getAsString(),
+                                urlInfo.getAsJsonArray().get(4).getAsString(),
+                                urlInfo.getAsJsonArray().get(7).getAsString(), this.domainModel));
+                    }
+
+                    this.urlService.addAllUrl(urlList);
+                    this.meilisearchService.indexProducts(urlList);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         // super messy, gotta fix it
         // TODO: Make it stop after a certain date, for now it's fine for testing
-        while (!this.timestamp.toString().equals(stopIndexingTimestamp)) {
-            if (getLinks(this.domain, this.timestamp.toString().substring(0, this.timestamp.getTimeType().getSub()), false)) { // If it is larger than the limit
-                // Store what the too large one was
-                one = this.timestamp.getTimeType();
-                num = this.timestamp.get(one);
-
-                // Go down one time
-                this.timestamp.setTimeType(this.timestamp.goDownOneTime(this.timestamp.getTimeType()));
-            } else { // If it is smaller than the limit
-                // Go up one time if
-                if (one == this.timestamp.getTimeType() && num == this.timestamp.get(this.timestamp.getTimeType())) {
-                    this.timestamp.setTimeType(this.timestamp.goUpOneTime(this.timestamp.getTimeType()));
-                }
-                this.timestamp.plus(this.timestamp.getTimeType(), 1);
-            }
-
-            this.domainModel.setTime(this.timestamp.getTimeType());
-            this.domainModel.setTimestamp(this.timestamp.toString());
-            this.domainService.saveDomain(this.domainModel);
-        }
+//        while (!this.timestamp.toString().equals(stopIndexingTimestamp)) {
+//            if (getLinks(this.domain, this.timestamp.toString().substring(0, this.timestamp.getTimeType().getSub()), false)) { // If it is larger than the limit
+//                // Store what the too large one was
+//                one = this.timestamp.getTimeType();
+//                num = this.timestamp.get(one);
+//
+//                // Go down one time
+//                this.timestamp.setTimeType(this.timestamp.goDownOneTime(this.timestamp.getTimeType()));
+//            } else { // If it is smaller than the limit
+//                // Go up one time if
+//                if (one == this.timestamp.getTimeType() && num == this.timestamp.get(this.timestamp.getTimeType())) {
+//                    this.timestamp.setTimeType(this.timestamp.goUpOneTime(this.timestamp.getTimeType()));
+//                }
+//                this.timestamp.plus(this.timestamp.getTimeType(), 1);
+//            }
+//
+//            this.domainModel.setTime(this.timestamp.getTimeType());
+//            this.domainModel.setTimestamp(this.timestamp.toString());
+//            this.domainService.saveDomain(this.domainModel);
+//        }
     }
 
     private boolean getLinks(String domain, String timestamp, boolean firstAttempt) {

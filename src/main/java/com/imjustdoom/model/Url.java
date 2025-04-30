@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"url", "mimeType", "timestamp", "endTimestamp", "statusCode", "digest", "domain_id"}))
 public class Url {
     @Id
-    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
