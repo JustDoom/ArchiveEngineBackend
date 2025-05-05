@@ -1,28 +1,25 @@
 package com.imjustdoom.model;
 
-import com.imjustdoom.indexer.Timestamp;
 import jakarta.persistence.*;
 
 @Entity
 public class FailedRequest {
-    public FailedRequest() {}
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(nullable = false)
-    private String timestamp;
+    private int statusCode;
+
+    @Column(nullable = false)
+    private int page;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Domain domain;
 
-    @Column(nullable = false)
-    private Timestamp.Time time;
+    public FailedRequest() {}
 
-    public FailedRequest(String timestamp, Timestamp.Time time, Domain domain) {
-        this.timestamp = timestamp;
+    public FailedRequest(Domain domain) {
         this.domain = domain;
-        this.time = time;
     }
 }

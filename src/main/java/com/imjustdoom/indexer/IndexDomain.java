@@ -2,6 +2,7 @@ package com.imjustdoom.indexer;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.imjustdoom.exception.HttpStatusException;
 import com.imjustdoom.model.Domain;
 import com.imjustdoom.model.Url;
 import com.imjustdoom.service.DomainService;
@@ -78,10 +79,10 @@ public class IndexDomain {
         num = -1;
 
         try {
-            int pages = Integer.parseInt(readUrl(String.format("https://web.archive.org/cdx/search/cdx?url=%s&matchType=prefix&showNumPages=true", "cdn.discordapp.com")));
+            int pages = Integer.parseInt(readUrl(String.format("https://web.archive.org/cdx/search/cdx?url=%s&matchType=domain&showNumPages=true", this.domain)));
             System.out.println("Pages " + pages);
             for (int i = 0; i < pages; i++) {
-                String url = String.format("https://web.archive.org/cdx/search/cdx?url=%s&matchType=prefix&collapse=urlkey&output=json&fl=original,mimetype,timestamp,endtimestamp,statuscode,groupcount,uniqcount,digest&page=%s", "cdn.discordapp.com", i);
+                String url = String.format("https://web.archive.org/cdx/search/cdx?url=%s&matchType=domain&collapse=urlkey&output=json&fl=original,mimetype,timestamp,endtimestamp,statuscode,groupcount,uniqcount,digest&page=%s", this.domain, i);
                 System.out.println(url);
                 try {
                     String response = readUrl(url);
@@ -106,13 +107,14 @@ public class IndexDomain {
 
                     this.urlService.addAllUrl(urlList);
                     this.meilisearchService.indexProducts(urlList);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (HttpStatusException e) {
+                    this.failedRequestService.addFailedRequest(this.timestamp.toString(), this.timestamp.getTimeType(), this.domainModel);
                 }
             }
-        } catch (IOException e) {
+        } catch (HttpStatusException e) {
+            System.err.println("There was an error when making the request to the API. Error Code: " + e.getCode());
+        } catch (Exception e) {
+            System.err.println("There was an error trying to fetch page information");
             e.printStackTrace();
         }
 
@@ -182,7 +184,7 @@ public class IndexDomain {
         return false;
     }
 
-    private String readUrl(String urlString) throws IOException {
+    private String readUrl(String urlString) throws IOException, HttpStatusException {
         URL url = new URL(urlString);
         HttpURLConnection huc = (HttpURLConnection) url.openConnection();
         HttpURLConnection.setFollowRedirects(false);
@@ -192,7 +194,7 @@ public class IndexDomain {
 
         int responseCode = huc.getResponseCode();
         if (responseCode != HttpURLConnection.HTTP_OK) {
-            throw new IOException("Failed to fetch data: HTTP response code " + responseCode);
+            throw new HttpStatusException(responseCode);
         }
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(huc.getInputStream()))) {
