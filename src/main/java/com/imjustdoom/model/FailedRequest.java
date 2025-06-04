@@ -15,11 +15,13 @@ public class FailedRequest {
     private int page;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Domain domain;
+    private TopDomain topDomain;
 
     public FailedRequest() {}
 
-    public FailedRequest(Domain domain) {
-        this.domain = domain;
+    public FailedRequest(int statusCode, int page, TopDomain topDomain) {
+        this.statusCode = statusCode;
+        this.page = page;
+        this.topDomain = topDomain;
     }
 }

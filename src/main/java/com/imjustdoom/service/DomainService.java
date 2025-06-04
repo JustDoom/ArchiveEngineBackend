@@ -1,6 +1,7 @@
 package com.imjustdoom.service;
 
 import com.imjustdoom.model.Domain;
+import com.imjustdoom.model.TopDomain;
 import com.imjustdoom.repository.DomainRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -16,15 +17,15 @@ public class DomainService {
         this.domainRepository = domainRepository;
     }
 
-    public void addDomain(String domain) {
-        this.domainRepository.save(new Domain(domain));
+    public Domain addDomain(String domain, TopDomain topDomain) {
+        return this.domainRepository.save(new Domain(domain, topDomain));
     }
 
     public Optional<Domain> getDomain(String domain) {
         return this.domainRepository.findByDomain(domain);
     }
 
-    public void saveDomain(Domain domain) {
-        this.domainRepository.save(domain);
+    public void saveDomain(Domain topDomain) {
+        this.domainRepository.save(topDomain);
     }
 }

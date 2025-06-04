@@ -2,19 +2,35 @@ package com.imjustdoom.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.validator.constraints.URL;
 
+import javax.validation.constraints.Size;
+
+/**
+ * Each unique url that gets indexed
+ */
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"url", "timestamp", "end_timestamp"}))
+@Table(indexes = {
+        @Index(name = "urlIndex", columnList = "url", unique = true)
+})
 public class Url {
     @Id
-    @Column(nullable = false, columnDefinition="TEXT")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    // TODO: Do not store domain or subdomain here maybe
+    @Column(nullable = false, columnDefinition="VARCHAR(2048)", unique = true)
+    @Size(max = 2048, message = "URL must not be more than 2048 characters")
+    @URL(message = "Invalid URL")
     private String url;
 
-    @Column(nullable = false)
-    private String timestamp;
+    // TODO: Small url hash for duplication detection?
 
     @Column(nullable = false)
-    private String endTimestamp;
+    private Long timestamp;
+
+    @Column(nullable = false)
+    private Long endTimestamp;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -22,22 +38,26 @@ public class Url {
 
     public Url() {}
 
-    public Url(String url, String timestamp, String endTimestamp, Domain domain) {
+    public Url(String url, Long timestamp, Long endTimestamp, Domain domain) {
         this.url = url;
         this.timestamp = timestamp;
         this.endTimestamp = endTimestamp;
         this.domain = domain;
     }
 
+    public Long getId() {
+        return this.id;
+    }
+
     public String getUrl() {
         return this.url;
     }
 
-    public String getTimestamp() {
+    public Long getTimestamp() {
         return this.timestamp;
     }
 
-    public String getEndTimestamp() {
+    public Long getEndTimestamp() {
         return this.endTimestamp;
     }
 

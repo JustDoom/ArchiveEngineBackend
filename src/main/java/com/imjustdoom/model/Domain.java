@@ -2,42 +2,34 @@ package com.imjustdoom.model;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The full domain, including subdomain, that has been searched.
+ */
 @Entity
 public class Domain {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Column(nullable = false, unique = true)
+    @Size(max = 255, message = "Domain must not be over 255")
     private String domain;
 
-    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, mappedBy = "domain")
-    private List<Url> urls = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    private TopDomain topDomain;
 
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, mappedBy = "domain")
-    private List<FailedRequest> failedRequests = new ArrayList<>();
+    private final List<Url> urls = new ArrayList<>();
 
-    // For saving current page number if a restart happens
-    @Column
-    private Integer pageNumber;
+    protected Domain() {}
 
-    // Total pages found when starting a scan
-    @Column
-    private Integer totalPages;
-
-    // Last date/time a scan finished
-    @Column
-    private LocalDateTime lastScanned;
-
-    // Is a scan currently running, used to restart scans when a restart happens
-    @Column(nullable = false)
-    private boolean running;
-
-    public Domain() {}
-
-    public Domain(String domain) {
+    public Domain(String domain, TopDomain topDomain) {
         this.domain = domain;
+        this.topDomain = topDomain;
     }
 
     public String getDomain() {

@@ -20,6 +20,6 @@ public class MeilisearchService {
 
     public void indexProducts(List<Url> urls) throws Exception {
         String json = new ObjectMapper().writeValueAsString(urls);
-        index.addDocuments(json);
+       this.index.addDocuments(json);
     }
 }

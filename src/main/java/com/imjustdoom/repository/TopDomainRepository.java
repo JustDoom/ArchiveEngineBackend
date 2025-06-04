@@ -1,17 +1,17 @@
 package com.imjustdoom.repository;
 
-import com.imjustdoom.model.Domain;
+import com.imjustdoom.model.TopDomain;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface DomainRepository extends JpaRepository<Domain, Integer> {
+public interface TopDomainRepository extends JpaRepository<TopDomain, Integer> {
 
-//    Optional<Domain> findById(long id);
+//    Optional<TopDomain> findById(long id);
 
 //    boolean existsByDomain(String domain);
 
-    Optional<Domain> findByDomain(String domain);
+    Optional<TopDomain> findByTopDomain(String topDomain);
 }

@@ -1,8 +1,7 @@
 package com.imjustdoom.service;
 
-import com.imjustdoom.indexer.Timestamp;
-import com.imjustdoom.model.Domain;
 import com.imjustdoom.model.FailedRequest;
+import com.imjustdoom.model.TopDomain;
 import com.imjustdoom.repository.FailedRequestRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -16,9 +15,8 @@ public class FailedRequestService {
         this.failedRequestRepository = failedRequestRepository;
     }
 
-    public void addFailedRequest(String timestamp, Timestamp.Time time, Domain domain) {
-        if (this.failedRequestRepository.existsByTimestampAndDomain(timestamp, domain)) return;
-        FailedRequest failedRequest = new FailedRequest(timestamp, time, domain);
+    public void addFailedRequest(int statusCode, int page, TopDomain topDomain) {
+        FailedRequest failedRequest = new FailedRequest(statusCode, page, topDomain);
         this.failedRequestRepository.save(failedRequest);
     }
 }
