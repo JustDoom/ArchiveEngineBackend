@@ -1,6 +1,8 @@
 package com.imjustdoom.indexer;
 
 import com.imjustdoom.service.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +10,8 @@ import java.time.LocalDateTime;
 
 @Component
 public class IndexRunner implements CommandLineRunner {
+    private static final Logger LOG = LoggerFactory.getLogger(IndexRunner.class);
+
     private final UrlService urlService;
     private final TopDomainService topDomainService;
     private final DomainService domainService;
@@ -28,7 +32,7 @@ public class IndexRunner implements CommandLineRunner {
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 case "--disable" -> {
-                    System.out.println("Disabling indexer");
+                    LOG.info("Disabling indexer");
                     return;
                 }
                 case "--domain" -> domain = args[i + 1];
@@ -36,7 +40,7 @@ public class IndexRunner implements CommandLineRunner {
         }
 
         if (domain.isEmpty()) {
-            System.out.println("Please provide a domain to scan");
+            LOG.info("Please provide a domain to scan");
             return;
         }
 
@@ -44,9 +48,9 @@ public class IndexRunner implements CommandLineRunner {
         IndexDomain indexer = new IndexDomain(domain, this.urlService, this.topDomainService, this.domainService, this.failedRequestService, this.meilisearchService);
         try {
             indexer.startScanning(10);
-            System.out.println("Indexer finished");
+            LOG.info("Indexer finished for {}");
         } catch (Exception exception) {
-            System.err.println("Failed to run indexer :(");
+            LOG.error("Failed to run indexer :(");
         }
         indexer.getTopDomainModel().setLastScanned(LocalDateTime.now());
         this.topDomainService.saveDomain(indexer.getTopDomainModel());

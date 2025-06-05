@@ -1,6 +1,8 @@
 package com.imjustdoom.service;
 
 import com.imjustdoom.model.Url;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,6 +17,8 @@ import java.util.concurrent.*;
 @Validated
 @Service
 public class UrlService {
+    private static final Logger LOG = LoggerFactory.getLogger(UrlService.class);
+    
     private static final String SQL = "INSERT INTO url (end_timestamp, timestamp, url, url_hash, domain_id) VALUES (?, ?, ?, ?, ?)";
     private static final int BATCH_SIZE = 5000;
 
@@ -63,9 +67,9 @@ public class UrlService {
                     return batch.size();
                 }
             });
-            System.out.println("Successfully inserted batch of " + batch.size() + " URLs");
+            LOG.info("Successfully inserted batch of {} URLs", batch.size());
         } catch (DataIntegrityViolationException e) {
-            System.out.println("Batch insert failed, inserting individually to handle duplicates");
+            LOG.info("Batch insert failed, inserting individually to handle duplicates");
             insertSingleWithDupHandling(batch);
         }
     }
@@ -89,6 +93,6 @@ public class UrlService {
             }
         }
 
-        System.out.println("Individual insert completed: " + successCount + " inserted, " + duplicateCount + " duplicates skipped");
+        LOG.info("Individual insert completed: {} inserted, {} duplicates skipped", successCount, duplicateCount);
     }
 }

@@ -7,9 +7,12 @@ import com.google.gson.JsonParser;
 import com.imjustdoom.UrlUtil;
 import com.imjustdoom.exception.HttpStatusException;
 import com.imjustdoom.model.Domain;
+import com.imjustdoom.model.FailedRequest;
 import com.imjustdoom.model.TopDomain;
 import com.imjustdoom.model.Url;
 import com.imjustdoom.service.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,7 +25,9 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class IndexDomain {
-    // 5 times out and 3 seems to work fine
+    private static final Logger LOG = LoggerFactory.getLogger(IndexDomain.class);
+    
+    // 5 times out and 3 seems to work fine. 4 seems to be right on the edge and sometimes fails (Connection refused)
     private final ExecutorService executor = Executors.newFixedThreadPool(3);
 
     private final TopDomain topDomainModel;
@@ -54,7 +59,7 @@ public class IndexDomain {
         this.topDomainModel.setTotalPages(pages);
         this.topDomainService.saveDomain(this.topDomainModel);
 
-        System.out.printf("Total pages to process for the domain %s: %d%n", this.topDomainModel.getDomain(), pages);
+        LOG.info("Total pages to process for the domain {}: {}", this.topDomainModel.getDomain(), pages);
 
         AtomicInteger completedPages = new AtomicInteger(0);
         for (int i = 0; i < pages; i += batchSize) {
@@ -75,7 +80,7 @@ public class IndexDomain {
                             this.failedRequestService.addFailedRequest(exception.getCode(), finalJ, this.topDomainModel);
                             return;
                         }
-                        System.err.println("Error processing page " + finalJ + ": " + e.getMessage());
+                        LOG.error("Error processing page {}: {}", finalJ, e.getMessage());
                         this.failedRequestService.addFailedRequest(-1, finalJ, this.topDomainModel);
                     }
                 }, this.executor));
@@ -83,7 +88,9 @@ public class IndexDomain {
 
             CompletableFuture.allOf(batchFutures.toArray(new CompletableFuture[0])).join();
 
-            System.out.println("Completed batch " + (i / batchSize + 1) + "/" + ((pages + batchSize - 1) / batchSize));
+            LOG.info("Completed batch {}/{}", i / batchSize + 1, (pages + batchSize - 1) / batchSize);
+
+            attemptFailedBatch(10);
         }
     }
 
@@ -92,7 +99,7 @@ public class IndexDomain {
             JsonElement element = JsonParser.parseString(response);
 
             if (element.getAsJsonArray().size() <= 1) {
-                System.out.println("No data on page " + pageNum);
+                LOG.info("No data on page {}", pageNum);
                 return;
             }
 
@@ -117,9 +124,9 @@ public class IndexDomain {
             }
 
             int completed = completedPages.incrementAndGet();
-            System.out.println("Completed page " + (pageNum + 1) + "/" + totalPages + " (" + completed + " total completed) - " + urlList.size() + " URLs processed");
+            LOG.info("Completed page {}/{} ({} total completed) - {} URLs processed", pageNum, totalPages, completed, urlList.size());
         } catch (Exception e) {
-            System.err.println("Error processing response for page " + pageNum + ": " + e.getMessage());
+            LOG.error("Error processing meilisearch response for page {}: {}", pageNum, e.getMessage());
             e.printStackTrace();
         }
     }
@@ -156,13 +163,51 @@ public class IndexDomain {
                         urlInfo.getAsJsonArray().get(3).getAsLong(),
                         this.domainMap.get(cleaned)));
             } catch (Exception e) {
-                System.err.println("Error processing URL at index " + j + ": " + e.getMessage());
+                LOG.error("Error processing URL at index {}: {}", j, e.getMessage());
             }
         }
     }
 
+    public void attemptFailedBatch(int size) {
+        AtomicInteger completedPages = new AtomicInteger(0);
+        List<CompletableFuture<Void>> batchFutures = new ArrayList<>();
+        List<FailedRequest> failedRequests = this.failedRequestService.getFailedForTopDomain(this.topDomainModel);
+        LOG.info("Attempting to fetch {} failed requests for a reattempt", failedRequests.size());
+        if (failedRequests.isEmpty()) {
+            LOG.info("Found no failed requests for the domain {}", this.topDomainModel.getDomain());
+            return;
+        }
+
+        for (FailedRequest failedRequest : failedRequests) {
+            int page = failedRequest.getPage();
+            String url = String.format("https://web.archive.org/cdx/search/cdx?url=%s&matchType=domain&collapse=urlkey&output=json&fl=original,mimetype,timestamp,endtimestamp,statuscode,groupcount,uniqcount,digest&page=%s", this.topDomainModel.getDomain(), page);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ignored) {}
+            batchFutures.add(CompletableFuture.runAsync(() -> {
+                try {
+                    processPageResponse(readUrl(url), page, size, completedPages);
+                    this.failedRequestService.removeFailedRequest(failedRequest);
+                } catch (Exception e) {
+                    if (e instanceof HttpStatusException) {
+                        failedRequest.setFailCount(failedRequest.getFailCount() + 1);
+                        this.failedRequestService.saveFailedRequest(failedRequest);
+                        return;
+                    }
+                    LOG.error("Error processing page {}: {}", page, e.getMessage());
+                    failedRequest.setFailCount(failedRequest.getFailCount() + 1);
+                    this.failedRequestService.saveFailedRequest(failedRequest);
+                }
+            }, this.executor));
+        }
+
+        CompletableFuture.allOf(batchFutures.toArray(new CompletableFuture[0])).join();
+
+        LOG.info("Completed {}/{}", completedPages, failedRequests.size());
+    }
+
     private String readUrl(String urlString) throws IOException, HttpStatusException {
-        System.out.println("Making request to: " + urlString);
+        LOG.info("Making request to: {}", urlString);
 
         URL url = URI.create(urlString).toURL();
         HttpURLConnection huc = (HttpURLConnection) url.openConnection();
