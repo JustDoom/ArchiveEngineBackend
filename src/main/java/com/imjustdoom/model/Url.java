@@ -11,7 +11,8 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(indexes = {
-        @Index(name = "urlIndex", columnList = "url", unique = true)
+//        @Index(name = "urlIndex", columnList = "url", unique = true),
+        @Index(name = "urlHashIndex", columnList = "urlHash", unique = true)
 })
 public class Url {
     @Id
@@ -24,7 +25,8 @@ public class Url {
     @URL(message = "Invalid URL")
     private String url;
 
-    // TODO: Small url hash for duplication detection?
+    @Column(nullable = false, length = 64, unique = true)
+    private String urlHash;
 
     @Column(nullable = false)
     private Long timestamp;
@@ -38,8 +40,9 @@ public class Url {
 
     public Url() {}
 
-    public Url(String url, Long timestamp, Long endTimestamp, Domain domain) {
+    public Url(String url, String hash, Long timestamp, Long endTimestamp, Domain domain) {
         this.url = url;
+        this.urlHash = hash;
         this.timestamp = timestamp;
         this.endTimestamp = endTimestamp;
         this.domain = domain;
@@ -51,6 +54,10 @@ public class Url {
 
     public String getUrl() {
         return this.url;
+    }
+
+    public String getUrlHash() {
+        return this.urlHash;
     }
 
     public Long getTimestamp() {

@@ -32,6 +32,10 @@ public class Domain {
         this.topDomain = topDomain;
     }
 
+    public Long getId() {
+        return this.id;
+    }
+
     public String getDomain() {
         return this.domain;
     }

@@ -1,7 +1,6 @@
 # ArchiveEngine
 
-[![Discord Server](https://img.shields.io/discord/810752039470235688?color=7289da&label=MY%20DISCORD&style=flat-square&logo=appveyor)](https://discord.gg/ydGK5jYV6t)
-[![Discord Server](https://img.shields.io/discord/979589333524820018?color=7289da&label=MY%20ARCHIVE%20DISCORD&style=flat-square&logo=appveyor)](https://discord.gg/k8RcgxpnBS)
+[![Discord Server](https://img.shields.io/discord/979589333524820018?color=7289da&label=EimerArchive&style=flat-square&logo=appveyor)](https://discord.gg/k8RcgxpnBS)
  
 This is a project to store all the archived links in the wayback machine in a place they can be searched through.  
 When running this it can take a while to get the response so please wait a while.
@@ -36,10 +35,10 @@ General feature TODO, doesn't include code cleanups, small fixes and stuff.
 
 ### Indexer
 
-- [x] Indexing of links from a certain topDomain
+- [x] Indexing of links from a certain domain
 - [x] Increment the timestamp automatically when a request is done
 - [ ] Re-try indexing of failed requests (Usually 504 errors)
 - [x] Stop indexing at a certain date
-- [x] Allow controlling of basic features (If indexer is running, topDomain to index, start timestamp?) with startup arguments
+- [x] Allow controlling of basic features (If indexer is running, domain to index, start timestamp?) with startup arguments
 - [ ] Allow indexing of multiple domains at once. Not sure of the request limit to archive.org's API
-- [ ] Stop duplicate links, links can be in it multiple times (links that change like topDomain.com/latestDownload) but not if everything is the same (timestamp, link, mimeType, status code etc) as it would be the exact same link.
+- [ ] Stop duplicate links, links can be in it multiple times (links that change like domain.com/latestDownload) but not if everything is the same (timestamp, link, mimeType, status code etc) as it would be the exact same link.
