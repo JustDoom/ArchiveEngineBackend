@@ -10,8 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 @Validated
 @Service
@@ -19,7 +18,19 @@ public class UrlService {
     private static final String SQL = "INSERT INTO url (end_timestamp, timestamp, url, url_hash, domain_id) VALUES (?, ?, ?, ?, ?)";
     private static final int BATCH_SIZE = 5000;
 
-    private final ExecutorService dbExecutor = Executors.newSingleThreadExecutor();
+    private final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(100);
+    private final ExecutorService dbExecutor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
+            queue,
+            Executors.defaultThreadFactory(),
+            (r, executor) -> {
+                try {
+                    executor.getQueue().put(r);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RejectedExecutionException("Interrupted while waiting for queue space", e);
+                }
+            }
+    );
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -28,11 +39,11 @@ public class UrlService {
     }
 
     public void addAllUrlsTransaction(List<Url> urls) {
+        System.out.println(queue.size());
         this.dbExecutor.submit(() -> {
             for (int i = 0; i < urls.size(); i += BATCH_SIZE) {
                 int endIndex = Math.min(i + BATCH_SIZE, urls.size());
-                List<Url> batch = urls.subList(i, endIndex);
-                insertBatchWithDubHandling(batch);
+                insertBatchWithDubHandling(urls.subList(i, endIndex));
             }
         });
     }
@@ -48,6 +59,7 @@ public class UrlService {
                     ps.setString(4, url.getUrlHash());
                     ps.setObject(5, url.getDomain().getId());
                 }
+
                 public int getBatchSize() {
                     return batch.size();
                 }

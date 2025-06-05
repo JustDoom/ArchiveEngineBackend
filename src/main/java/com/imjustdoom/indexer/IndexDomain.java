@@ -169,7 +169,7 @@ public class IndexDomain {
         HttpURLConnection huc = (HttpURLConnection) url.openConnection();
         HttpURLConnection.setFollowRedirects(false);
         huc.setConnectTimeout(30 * 1000);
-        huc.setReadTimeout(30 * 1000); // Add read timeout
+        huc.setReadTimeout(30 * 1000);
         huc.setRequestMethod("GET");
         huc.setRequestProperty("User-Agent", "Wayback Engine - In Development (justdoomdev@gmail.com)");
 
