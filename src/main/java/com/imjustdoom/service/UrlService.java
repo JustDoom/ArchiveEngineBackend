@@ -16,6 +16,7 @@ import java.util.concurrent.Executors;
 @Validated
 @Service
 public class UrlService {
+    private static final String SQL = "INSERT INTO url (end_timestamp, timestamp, url, url_hash, domain_id) VALUES (?, ?, ?, ?, ?)";
     private static final int BATCH_SIZE = 5000;
 
     private final ExecutorService dbExecutor = Executors.newSingleThreadExecutor();
@@ -38,8 +39,7 @@ public class UrlService {
 
     protected void insertBatchWithDubHandling(List<Url> batch) {
         try {
-            String sql = "INSERT INTO url (end_timestamp, timestamp, url, url_hash, domain_id) VALUES (?, ?, ?, ?, ?)";
-            this.jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            this.jdbcTemplate.batchUpdate(SQL, new BatchPreparedStatementSetter() {
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
                     Url url = batch.get(i);
                     ps.setLong(1, url.getEndTimestamp());
@@ -65,8 +65,7 @@ public class UrlService {
 
         for (Url url : urls) {
             try {
-                String sql = "INSERT INTO url (end_timestamp, timestamp, url, url_hash, domain_id) VALUES (?, ?, ?, ?, ?)";
-                this.jdbcTemplate.update(sql, ps -> {
+                this.jdbcTemplate.update(SQL, ps -> {
                     ps.setLong(1, url.getEndTimestamp());
                     ps.setLong(2, url.getTimestamp());
                     ps.setString(3, url.getUrl());

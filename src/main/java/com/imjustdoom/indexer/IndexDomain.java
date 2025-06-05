@@ -26,6 +26,7 @@ public class IndexDomain {
     private final ExecutorService executor = Executors.newFixedThreadPool(3);
 
     private final TopDomain topDomainModel;
+    private final Map<String, Domain> domainMap = new ConcurrentHashMap<>();
     private final Cache<String, Boolean> urlSet = CacheBuilder.newBuilder()
             .maximumSize(100000)
             .expireAfterAccess(2, TimeUnit.MINUTES)
@@ -96,19 +97,16 @@ public class IndexDomain {
                 return;
             }
 
-            Map<String, Domain> domainMap = new ConcurrentHashMap<>();
             List<Url> urlList = Collections.synchronizedList(new ArrayList<>());
 
             // Process URLs in parallel batches
-            int urlBatchSize = 100;
+            int urlBatchSize = 1000;
             List<CompletableFuture<Void>> urlFutures = new ArrayList<>();
 
             for (int j = 1; j < element.getAsJsonArray().size(); j += urlBatchSize) {
                 final int startIndex = j;
                 final int endIndex = Math.min(j + urlBatchSize, element.getAsJsonArray().size());
-
-                CompletableFuture<Void> urlFuture = CompletableFuture.runAsync(() -> processUrlBatch(element, startIndex, endIndex, domainMap, urlList));
-                urlFutures.add(urlFuture);
+                urlFutures.add(CompletableFuture.runAsync(() -> processUrlBatch(element, startIndex, endIndex, urlList)));
             }
 
             // Wait for all URL processing to complete
@@ -127,7 +125,7 @@ public class IndexDomain {
         }
     }
 
-    private void processUrlBatch(JsonElement element, int startIndex, int endIndex, Map<String, Domain> domainMap, List<Url> urlList) {
+    private void processUrlBatch(JsonElement element, int startIndex, int endIndex, List<Url> urlList) {
         for (int j = startIndex; j < endIndex; j++) {
             try {
                 JsonElement urlInfo = element.getAsJsonArray().get(j);
@@ -148,8 +146,8 @@ public class IndexDomain {
                 this.urlSet.put(urlHash, true);
                 String cleaned = UrlUtil.cleanUrl(foundUrl);
 
-                if (!domainMap.containsKey(cleaned)) {
-                    domainMap.put(cleaned, this.domainService.getDomain(cleaned).orElseGet(() -> this.domainService.addDomain(cleaned, this.topDomainModel)));
+                if (!this.domainMap.containsKey(cleaned)) {
+                    this.domainMap.put(cleaned, this.domainService.getDomain(cleaned).orElseGet(() -> this.domainService.addDomain(cleaned, this.topDomainModel)));
                 }
 
                 urlList.add(new Url(
@@ -157,7 +155,7 @@ public class IndexDomain {
                         urlHash,
                         urlInfo.getAsJsonArray().get(2).getAsLong(),
                         urlInfo.getAsJsonArray().get(3).getAsLong(),
-                        domainMap.get(cleaned)));
+                        this.domainMap.get(cleaned)));
             } catch (Exception e) {
                 System.err.println("Error processing URL at index " + j + ": " + e.getMessage());
             }
