@@ -120,7 +120,7 @@ public class IndexDomain {
 
             if (!urlList.isEmpty()) {
                 this.urlService.addAllUrlsTransaction(urlList);
-                this.meilisearchService.indexProducts(urlList);
+                this.meilisearchService.indexProducts(urlList.stream().map((url) -> new MeilisearchService.IndexUrl(url.getUrl(), url.getUrlHash(), this.topDomainModel.getDomain())).toList());
             }
 
             int completed = completedPages.incrementAndGet();
@@ -206,7 +206,7 @@ public class IndexDomain {
         }
 
         CompletableFuture.allOf(batchFutures.toArray(new CompletableFuture[0])).join();
-        completedPages.addAndGet(completedFails.get());
+        completedPages.addAndGet(completedFails.get()); // If a second round happens for a domain wih failed ones already in there this will not be accurate
         LOG.info("Completed {}/{}", completedFails, failedRequests.size());
     }
 

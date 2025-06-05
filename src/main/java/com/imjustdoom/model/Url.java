@@ -15,6 +15,7 @@ import javax.validation.constraints.Size;
 })
 public class Url {
     @Id
+    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -33,7 +34,7 @@ public class Url {
     @Column(nullable = false)
     private Long endTimestamp;
 
-    @JsonIgnore
+//    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private Domain domain;
 

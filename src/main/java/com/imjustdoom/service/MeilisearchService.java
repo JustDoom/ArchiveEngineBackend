@@ -1,7 +1,6 @@
 package com.imjustdoom.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.imjustdoom.model.Url;
 import com.meilisearch.sdk.Client;
 import com.meilisearch.sdk.Index;
 import org.springframework.stereotype.Service;
@@ -15,11 +14,15 @@ public class MeilisearchService {
 
     public MeilisearchService(Client client) {
         this.client = client;
-        this.index = client.index("urls");
+        client.createIndex("urls", "hash");
+        this.index = client.getIndex("urls");
+        this.index.updateFilterableAttributesSettings(new String[]{"domain"});
     }
 
-    public void indexProducts(List<Url> urls) throws Exception {
+    public void indexProducts(List<IndexUrl> urls) throws Exception {
         String json = new ObjectMapper().writeValueAsString(urls);
         this.index.addDocuments(json);
     }
+
+    public record IndexUrl(String url, String hash, String domain) {}
 }

@@ -39,4 +39,8 @@ public class Domain {
     public String getDomain() {
         return this.domain;
     }
+
+    public TopDomain getTopDomain() {
+        return this.topDomain;
+    }
 }
