@@ -1,0 +1,202 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1749118394074-1
+      author: JustDoom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_domain
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: domain
+                  type: VARCHAR(255)
+              - column:
+                  name: top_domain_id
+                  type: BIGINT
+            tableName: domain
+  - changeSet:
+      id: 1749118394074-2
+      author: JustDoom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_failedrequest
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: status_code
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: page
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: !!float '0'
+                  name: fail_count
+                  type: INT
+              - column:
+                  name: top_domain_id
+                  type: BIGINT
+            tableName: failed_request
+  - changeSet:
+      id: 1749118394074-3
+      author: JustDoom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_topdomain
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: top_domain
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: !!float '-1'
+                  name: page_number
+                  type: INT
+              - column:
+                  name: total_pages
+                  type: INT
+              - column:
+                  name: last_scanned
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: !!float '0'
+                  name: priority
+                  type: INT
+            tableName: top_domain
+  - changeSet:
+      id: 1749118394074-4
+      author: JustDoom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_url
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: url
+                  type: VARCHAR(2048)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: url_hash
+                  type: VARCHAR(64)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: timestamp
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: end_timestamp
+                  type: BIGINT
+              - column:
+                  name: domain_id
+                  type: BIGINT
+            tableName: url
+  - changeSet:
+      id: 1749118394074-5
+      author: JustDoom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: domain
+            constraintName: uc_domain_domain
+            tableName: domain
+  - changeSet:
+      id: 1749118394074-6
+      author: JustDoom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: top_domain
+            constraintName: uc_topdomain_topdomain
+            tableName: top_domain
+  - changeSet:
+      id: 1749118394074-7
+      author: JustDoom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: url_hash
+            indexName: urlHashIndex
+            tableName: url
+            unique: true
+  - changeSet:
+      id: 1749118394074-8
+      author: JustDoom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: top_domain_id
+            baseTableName: domain
+            constraintName: FK_DOMAIN_ON_TOPDOMAIN
+            referencedColumnNames: id
+            referencedTableName: top_domain
+  - changeSet:
+      id: 1749118394074-9
+      author: JustDoom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: top_domain_id
+            baseTableName: failed_request
+            constraintName: FK_FAILEDREQUEST_ON_TOPDOMAIN
+            referencedColumnNames: id
+            referencedTableName: top_domain
+  - changeSet:
+      id: 1749118394074-10
+      author: JustDoom
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: domain_id
+            baseTableName: url
+            constraintName: FK_URL_ON_DOMAIN
+            referencedColumnNames: id
+            referencedTableName: domain
+

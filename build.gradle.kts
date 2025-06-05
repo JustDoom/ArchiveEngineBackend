@@ -19,6 +19,7 @@ dependencies {
     api(libs.org.springframework.boot.spring.boot.configuration.processor)
     api(libs.javax.validation.validation.api)
     api(libs.org.springframework.boot.spring.boot.starter.validation)
+    api(libs.org.liquibase.liquibase.core)
     api("com.meilisearch.sdk:meilisearch-java:0.14.7")
     api("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.google.guava:guava:33.4.8-jre")

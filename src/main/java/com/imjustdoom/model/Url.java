@@ -11,7 +11,6 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(indexes = {
-//        @Index(name = "urlIndex", columnList = "url", unique = true),
         @Index(name = "urlHashIndex", columnList = "urlHash", unique = true)
 })
 public class Url {
@@ -20,12 +19,12 @@ public class Url {
     private Long id;
 
     // TODO: Do not store domain or subdomain here maybe
-    @Column(nullable = false, columnDefinition="VARCHAR(2048)", unique = true)
+    @Column(nullable = false, columnDefinition="VARCHAR(2048)")
     @Size(max = 2048, message = "URL must not be more than 2048 characters")
     @URL(message = "Invalid URL")
     private String url;
 
-    @Column(nullable = false, length = 64, unique = true)
+    @Column(nullable = false, length = 64)
     private String urlHash;
 
     @Column(nullable = false)

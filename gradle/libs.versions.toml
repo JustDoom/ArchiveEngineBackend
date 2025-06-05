@@ -4,6 +4,7 @@
 [versions]
 com-google-code-gson-gson = "2.13.1"
 javax-validation-validation-api = "2.0.1.Final"
+org-liquibase-liquibase-core = "4.32.0"
 org-mariadb-jdbc-mariadb-java-client = "3.5.3"
 org-springframework-boot-spring-boot-configuration-processor = "3.5.0"
 org-springframework-boot-spring-boot-devtools = "3.5.0"
@@ -17,6 +18,7 @@ org-springframework-security-spring-security-test = "6.5.0"
 [libraries]
 com-google-code-gson-gson = { module = "com.google.code.gson:gson", version.ref = "com-google-code-gson-gson" }
 javax-validation-validation-api = { module = "javax.validation:validation-api", version.ref = "javax-validation-validation-api" }
+org-liquibase-liquibase-core = { module = "org.liquibase:liquibase-core", version.ref = "org-liquibase-liquibase-core" }
 org-mariadb-jdbc-mariadb-java-client = { module = "org.mariadb.jdbc:mariadb-java-client", version.ref = "org-mariadb-jdbc-mariadb-java-client" }
 org-springframework-boot-spring-boot-configuration-processor = { module = "org.springframework.boot:spring-boot-configuration-processor", version.ref = "org-springframework-boot-spring-boot-configuration-processor" }
 org-springframework-boot-spring-boot-devtools = { module = "org.springframework.boot:spring-boot-devtools", version.ref = "org-springframework-boot-spring-boot-devtools" }
