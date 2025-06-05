@@ -48,7 +48,7 @@ public class IndexRunner implements CommandLineRunner {
         IndexDomain indexer = new IndexDomain(domain, this.urlService, this.topDomainService, this.domainService, this.failedRequestService, this.meilisearchService);
         try {
             indexer.startScanning(10);
-            LOG.info("Indexer finished for {}");
+            LOG.info("Indexer finished for {}", domain);
         } catch (Exception exception) {
             LOG.error("Failed to run indexer :(");
         }
