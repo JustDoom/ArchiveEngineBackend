@@ -18,7 +18,7 @@ public class UrlService {
     private static final String SQL = "INSERT INTO url (end_timestamp, timestamp, url, url_hash, domain_id) VALUES (?, ?, ?, ?, ?)";
     private static final int BATCH_SIZE = 5000;
 
-    private final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(100);
+    private final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(50);
     private final ExecutorService dbExecutor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
             queue,
             Executors.defaultThreadFactory(),
