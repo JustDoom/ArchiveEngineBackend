@@ -88,7 +88,7 @@ public class IndexDomain {
 
             LOG.info("Completed batch {}/{}", i / batchSize + 1, (pages + batchSize - 1) / batchSize);
 
-            attemptFailedBatch(10);
+            attemptFailedBatch(10, completedPages);
         }
 
         // TODO: Finish attempting failed batches
@@ -169,7 +169,11 @@ public class IndexDomain {
     }
 
     public void attemptFailedBatch(int size) {
-        AtomicInteger completedPages = new AtomicInteger(0);
+        attemptFailedBatch(size, new AtomicInteger(0));
+    }
+
+    public void attemptFailedBatch(int size, AtomicInteger completedPages) {
+        AtomicInteger completedFails = new AtomicInteger(0);
         List<CompletableFuture<Void>> batchFutures = new ArrayList<>();
         List<FailedRequest> failedRequests = this.failedRequestService.getFailedForTopDomain(this.topDomainModel);
         LOG.info("Attempting to fetch {} failed requests for a reattempt", failedRequests.size());
@@ -186,7 +190,7 @@ public class IndexDomain {
             } catch (InterruptedException ignored) {}
             batchFutures.add(CompletableFuture.runAsync(() -> {
                 try {
-                    processPageResponse(readUrl(url), page, size, completedPages);
+                    processPageResponse(readUrl(url), page, size, completedFails);
                     this.failedRequestService.removeFailedRequest(failedRequest);
                 } catch (Exception e) {
                     if (e instanceof HttpStatusException) {
@@ -202,8 +206,8 @@ public class IndexDomain {
         }
 
         CompletableFuture.allOf(batchFutures.toArray(new CompletableFuture[0])).join();
-
-        LOG.info("Completed {}/{}", completedPages, failedRequests.size());
+        completedPages.addAndGet(completedFails.get());
+        LOG.info("Completed {}/{}", completedFails, failedRequests.size());
     }
 
     private String readUrl(String urlString) throws IOException, HttpStatusException {
