@@ -46,6 +46,10 @@ public class TopDomain {
     @Column
     private LocalDateTime lastScanned;
 
+    @Column(nullable = false)
+    @ColumnDefault("0")
+    private int priority = 0;
+
     protected TopDomain() {}
 
     public TopDomain(String topDomain) {
@@ -78,5 +82,13 @@ public class TopDomain {
 
     public void setLastScanned(LocalDateTime lastScanned) {
         this.lastScanned = lastScanned;
+    }
+
+    public int getPriority() {
+        return this.priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 }

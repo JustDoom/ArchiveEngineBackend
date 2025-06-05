@@ -24,6 +24,14 @@ public class TopDomainService {
         return this.topDomainRepository.findByTopDomain(domain);
     }
 
+    public Optional<TopDomain> getTopPriorityNull() {
+        return this.topDomainRepository.findFirstByLastScannedIsNullOrderByPriorityDesc();
+    }
+
+    public Optional<TopDomain> getLastestTopDomain() {
+        return this.topDomainRepository.findFirstByOrderByLastScannedAsc();
+    }
+
     public void saveDomain(TopDomain topDomain) {
         this.topDomainRepository.save(topDomain);
     }

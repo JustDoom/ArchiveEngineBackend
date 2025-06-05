@@ -14,4 +14,8 @@ public interface TopDomainRepository extends JpaRepository<TopDomain, Integer> {
 //    boolean existsByDomain(String domain);
 
     Optional<TopDomain> findByTopDomain(String topDomain);
+
+    Optional<TopDomain> findFirstByLastScannedIsNullOrderByPriorityDesc();
+
+    Optional<TopDomain> findFirstByOrderByLastScannedAsc();
 }

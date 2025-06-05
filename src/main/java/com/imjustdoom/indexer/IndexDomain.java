@@ -43,15 +43,13 @@ public class IndexDomain {
     private final FailedRequestService failedRequestService;
     private final MeilisearchService meilisearchService;
 
-    public IndexDomain(String domain, UrlService urlService, TopDomainService topDomainService, DomainService domainService, FailedRequestService failedRequestService, MeilisearchService meilisearchService) {
+    public IndexDomain(TopDomain topDomain, UrlService urlService, TopDomainService topDomainService, DomainService domainService, FailedRequestService failedRequestService, MeilisearchService meilisearchService) {
+        this.topDomainModel = topDomain;
         this.urlService = urlService;
         this.topDomainService = topDomainService;
         this.domainService = domainService;
         this.failedRequestService = failedRequestService;
         this.meilisearchService = meilisearchService;
-
-        // Create the domain in the database if it doesn't exist
-        this.topDomainModel = this.topDomainService.getDomain(domain).orElseGet(() -> this.topDomainService.addTopDomain(domain));
     }
 
     public void startScanning(int batchSize) throws HttpStatusException, IOException {
@@ -92,6 +90,8 @@ public class IndexDomain {
 
             attemptFailedBatch(10);
         }
+
+        // TODO: Finish attempting failed batches
     }
 
     private void processPageResponse(String response, int pageNum, int totalPages, AtomicInteger completedPages) {

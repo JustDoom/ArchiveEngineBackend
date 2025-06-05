@@ -1,5 +1,6 @@
 package com.imjustdoom.indexer;
 
+import com.imjustdoom.model.TopDomain;
 import com.imjustdoom.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,6 +8,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Component
 public class IndexRunner implements CommandLineRunner {
@@ -39,20 +41,32 @@ public class IndexRunner implements CommandLineRunner {
             }
         }
 
-        if (domain.isEmpty()) {
-            LOG.info("Please provide a domain to scan");
-            return;
+        if (!domain.isEmpty()) {
+            String finalDomain = domain;
+            this.topDomainService.getDomain(domain).orElseGet(() -> this.topDomainService.addTopDomain(finalDomain));
         }
 
-        // Create the indexer
-        IndexDomain indexer = new IndexDomain(domain, this.urlService, this.topDomainService, this.domainService, this.failedRequestService, this.meilisearchService);
-        try {
-            indexer.startScanning(10);
-            LOG.info("Indexer finished for {}", domain);
-        } catch (Exception exception) {
-            LOG.error("Failed to run indexer :(");
+        while (true) {
+            Optional<TopDomain> topDomainOptional = this.topDomainService.getTopPriorityNull();
+            if (topDomainOptional.isEmpty()) {
+                topDomainOptional = this.topDomainService.getLastestTopDomain();
+                if (topDomainOptional.isEmpty()) {
+                    LOG.error("Well it would seem like we can not fetch any domains to index from :(");
+                    return;
+                }
+            }
+            TopDomain topDomain = topDomainOptional.get();
+
+            // Create the indexer
+            IndexDomain indexer = new IndexDomain(topDomain, this.urlService, this.topDomainService, this.domainService, this.failedRequestService, this.meilisearchService);
+            try {
+                indexer.startScanning(10);
+                LOG.info("Indexer finished for {}", topDomain.getDomain());
+            } catch (Exception exception) {
+                LOG.error("Failed to run indexer :(");
+            }
+            indexer.getTopDomainModel().setLastScanned(LocalDateTime.now());
+            this.topDomainService.saveDomain(indexer.getTopDomainModel());
         }
-        indexer.getTopDomainModel().setLastScanned(LocalDateTime.now());
-        this.topDomainService.saveDomain(indexer.getTopDomainModel());
     }
 }
