@@ -16,6 +16,7 @@ public class MeilisearchService {
         this.client = client;
         client.createIndex("urls", "hash");
         this.index = client.getIndex("urls");
+        this.index.updateSearchableAttributesSettings(new String[]{"url"});
         this.index.updateFilterableAttributesSettings(new String[]{"domain"});
     }
 
