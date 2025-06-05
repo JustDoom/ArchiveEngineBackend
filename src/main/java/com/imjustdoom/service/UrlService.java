@@ -20,7 +20,7 @@ public class UrlService {
 
     private final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(50);
     private final ExecutorService dbExecutor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
-            queue,
+            this.queue,
             Executors.defaultThreadFactory(),
             (r, executor) -> {
                 try {
@@ -39,7 +39,6 @@ public class UrlService {
     }
 
     public void addAllUrlsTransaction(List<Url> urls) {
-        System.out.println(queue.size());
         this.dbExecutor.submit(() -> {
             for (int i = 0; i < urls.size(); i += BATCH_SIZE) {
                 int endIndex = Math.min(i + BATCH_SIZE, urls.size());

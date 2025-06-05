@@ -4,6 +4,8 @@ import com.imjustdoom.service.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class IndexRunner implements CommandLineRunner {
     private final UrlService urlService;
@@ -23,7 +25,6 @@ public class IndexRunner implements CommandLineRunner {
     @Override
     public void run(String... args) {
         String domain = "";
-
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 case "--disable" -> {
@@ -40,7 +41,14 @@ public class IndexRunner implements CommandLineRunner {
         }
 
         // Create the indexer
-        new IndexDomain(domain, this.urlService, this.topDomainService, this.domainService, this.failedRequestService, this.meilisearchService).startScanning(10);
-        System.out.println("Indexer finished");
+        IndexDomain indexer = new IndexDomain(domain, this.urlService, this.topDomainService, this.domainService, this.failedRequestService, this.meilisearchService);
+        try {
+            indexer.startScanning(10);
+            System.out.println("Indexer finished");
+        } catch (Exception exception) {
+            System.err.println("Failed to run indexer :(");
+        }
+        indexer.getTopDomainModel().setLastScanned(LocalDateTime.now());
+        this.topDomainService.saveDomain(indexer.getTopDomainModel());
     }
 }

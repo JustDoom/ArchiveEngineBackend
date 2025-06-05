@@ -46,45 +46,44 @@ public class IndexDomain {
         this.meilisearchService = meilisearchService;
 
         // Create the domain in the database if it doesn't exist
-        this.topDomainModel = this.topDomainService.getDomain(domain).orElseGet(() -> this.topDomainService.addDomain(domain));
+        this.topDomainModel = this.topDomainService.getDomain(domain).orElseGet(() -> this.topDomainService.addTopDomain(domain));
     }
 
-    public void startScanning(int batchSize) {
-        try {
-            int pages = Integer.parseInt(readUrl(String.format("https://web.archive.org/cdx/search/cdx?url=%s&matchType=domain&showNumPages=true", this.topDomainModel.getDomain())));
+    public void startScanning(int batchSize) throws HttpStatusException, IOException {
+        int pages = Integer.parseInt(readUrl(String.format("https://web.archive.org/cdx/search/cdx?url=%s&matchType=domain&showNumPages=true", this.topDomainModel.getDomain())));
+        this.topDomainModel.setTotalPages(pages);
+        this.topDomainService.saveDomain(this.topDomainModel);
 
-            System.out.printf("Total pages to process for the domain %s: %d%n", this.topDomainModel.getDomain(), pages);
+        System.out.printf("Total pages to process for the domain %s: %d%n", this.topDomainModel.getDomain(), pages);
 
-            AtomicInteger completedPages = new AtomicInteger(0);
-            for (int i = 0; i < pages; i += batchSize) {
-                int count = Math.min(i + batchSize, pages);
-                List<CompletableFuture<Void>> batchFutures = new ArrayList<>();
+        AtomicInteger completedPages = new AtomicInteger(0);
+        for (int i = 0; i < pages; i += batchSize) {
+            int count = Math.min(i + batchSize, pages);
+            List<CompletableFuture<Void>> batchFutures = new ArrayList<>();
 
-                for (int j = i; j < count; j++) {
-                    String url = String.format("https://web.archive.org/cdx/search/cdx?url=%s&matchType=domain&collapse=urlkey&output=json&fl=original,mimetype,timestamp,endtimestamp,statuscode,groupcount,uniqcount,digest&page=%s", this.topDomainModel.getDomain(), j);
-                    int finalJ = j;
+            for (int j = i; j < count; j++) {
+                String url = String.format("https://web.archive.org/cdx/search/cdx?url=%s&matchType=domain&collapse=urlkey&output=json&fl=original,mimetype,timestamp,endtimestamp,statuscode,groupcount,uniqcount,digest&page=%s", this.topDomainModel.getDomain(), j);
+                int finalJ = j;
+                try {
                     Thread.sleep(50);
-                    batchFutures.add(CompletableFuture.runAsync(() -> {
-                        try {
-                            processPageResponse(readUrl(url), finalJ, pages, completedPages);
-                        } catch (Exception e) {
-                            if (e instanceof HttpStatusException exception) {
-                                this.failedRequestService.addFailedRequest(exception.getCode(), finalJ, this.topDomainModel);
-                                return;
-                            }
-                            System.err.println("Error processing page " + finalJ + ": " + e.getMessage());
+                } catch (InterruptedException ignored) {}
+                batchFutures.add(CompletableFuture.runAsync(() -> {
+                    try {
+                        processPageResponse(readUrl(url), finalJ, pages, completedPages);
+                    } catch (Exception e) {
+                        if (e instanceof HttpStatusException exception) {
+                            this.failedRequestService.addFailedRequest(exception.getCode(), finalJ, this.topDomainModel);
+                            return;
                         }
-                    }, this.executor));
-                }
-
-                CompletableFuture.allOf(batchFutures.toArray(new CompletableFuture[0])).join();
-
-                System.out.println("Completed batch " + (i / batchSize + 1) + "/" + ((pages + batchSize - 1) / batchSize));
+                        System.err.println("Error processing page " + finalJ + ": " + e.getMessage());
+                        this.failedRequestService.addFailedRequest(-1, finalJ, this.topDomainModel);
+                    }
+                }, this.executor));
             }
 
-        } catch (Exception e) {
-            System.err.println("Error in startScanning: " + e.getMessage());
-            e.printStackTrace();
+            CompletableFuture.allOf(batchFutures.toArray(new CompletableFuture[0])).join();
+
+            System.out.println("Completed batch " + (i / batchSize + 1) + "/" + ((pages + batchSize - 1) / batchSize));
         }
     }
 
@@ -186,5 +185,9 @@ public class IndexDomain {
             }
             return buffer.toString().trim();
         }
+    }
+
+    public TopDomain getTopDomainModel() {
+        return this.topDomainModel;
     }
 }

@@ -16,7 +16,7 @@ public class TopDomainService {
         this.topDomainRepository = topDomainRepository;
     }
 
-    public TopDomain addDomain(String domain) {
+    public TopDomain addTopDomain(String domain) {
         return this.topDomainRepository.save(new TopDomain(domain));
     }
 
