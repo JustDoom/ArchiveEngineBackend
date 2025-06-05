@@ -65,7 +65,7 @@ public class IndexDomain {
             List<CompletableFuture<Void>> batchFutures = new ArrayList<>();
 
             for (int j = i; j < count; j++) {
-                String url = String.format("https://web.archive.org/cdx/search/cdx?url=%s&matchType=domain&collapse=urlkey&output=json&fl=original,mimetype,timestamp,endtimestamp,statuscode,groupcount,uniqcount,digest&page=%s", this.topDomainModel.getDomain(), j);
+                String url = String.format("https://web.archive.org/cdx/search/cdx?url=%s&matchType=domain&collapse=urlkey&output=json&fl=original,timestamp,endtimestamp&page=%s", this.topDomainModel.getDomain(), j);
                 int finalJ = j;
                 try {
                     Thread.sleep(50);
@@ -159,8 +159,8 @@ public class IndexDomain {
                 urlList.add(new Url(
                         foundUrl,
                         urlHash,
+                        urlInfo.getAsJsonArray().get(1).getAsLong(),
                         urlInfo.getAsJsonArray().get(2).getAsLong(),
-                        urlInfo.getAsJsonArray().get(3).getAsLong(),
                         this.domainMap.get(cleaned)));
             } catch (Exception e) {
                 LOG.error("Error processing URL at index {}: {}", j, e.getMessage());
@@ -184,7 +184,7 @@ public class IndexDomain {
 
         for (FailedRequest failedRequest : failedRequests) {
             int page = failedRequest.getPage();
-            String url = String.format("https://web.archive.org/cdx/search/cdx?url=%s&matchType=domain&collapse=urlkey&output=json&fl=original,mimetype,timestamp,endtimestamp,statuscode,groupcount,uniqcount,digest&page=%s", this.topDomainModel.getDomain(), page);
+            String url = String.format("https://web.archive.org/cdx/search/cdx?url=%s&matchType=domain&collapse=urlkey&output=json&fl=original,timestamp,endtimestamp&page=%s", this.topDomainModel.getDomain(), page);
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ignored) {}
