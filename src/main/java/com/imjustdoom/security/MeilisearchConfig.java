@@ -13,7 +13,7 @@ public class MeilisearchConfig {
     public Client meilisearchClient() {
         Config config = new Config(
                 "http://localhost:7700",
-                "aVeryTestKey",
+                "",
                 new JacksonJsonHandler()
         );
         return new Client(config);
